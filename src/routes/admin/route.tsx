@@ -66,6 +66,13 @@ function AdminLayout() {
           >
             {memeriksa ? "Memeriksa..." : "Masuk"}
           </button>
+
+          <Link
+            to="/"
+            className="mt-4 inline-block text-sm font-bold text-muted-foreground underline"
+          >
+            ← Kembali ke beranda
+          </Link>
         </div>
       </div>
     );
