@@ -214,6 +214,47 @@ function LandingPage() {
             </div>
           </Reveal>
 
+          {/* KONTAK & SOSIAL MEDIA */}
+          <Reveal className="mb-4">
+            <h2 className="mb-6 font-display text-4xl font-black">
+              Hubungi & Ikuti Kami
+            </h2>
+            <div className="grid grid-cols-3 gap-3">
+              {/* TODO: ganti href dengan link WhatsApp asli, contoh: https://wa.me/62812xxxxxxx */}
+              <a
+                href="https://wa.me/6282213079439"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
+              >
+                <span className="text-3xl">💬</span>
+                <span className="text-sm font-black">WhatsApp</span>
+              </a>
+
+              {/* TODO: ganti href dengan link Instagram asli, contoh: https://instagram.com/sopoharimoting */}
+              <a
+                href="https://www.instagram.com/sopo_harimotting?stkn=a3B1b2JoMjk4aWNw"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
+              >
+                <span className="text-3xl">📷</span>
+                <span className="text-sm font-black">Instagram</span>
+              </a>
+
+              {/* TODO: ganti href dengan link TikTok asli, contoh: https://tiktok.com/@sopoharimoting */}
+              <a
+                href="https://www.tiktok.com/@sopoharimottingofficial?_r=1&_t=ZS-99aqjzQvm3Y"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
+              >
+                <span className="text-3xl">🎵</span>
+                <span className="text-sm font-black">TikTok</span>
+              </a>
+            </div>
+          </Reveal>
+
           <div className="mt-10 text-center">
             <Link
               to="/admin/scan"
