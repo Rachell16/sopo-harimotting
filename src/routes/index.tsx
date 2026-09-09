@@ -60,7 +60,7 @@ const FASILITAS = [
 
 const MOMEN: SlideMomen[] = [
   {
-    variasi: "Kelinci",
+    variasi: "kelinci",
     judul: "Dekat dengan Kelinci",
     teks: "Lihat langsung, ajak anak berkenalan dengan kelinci di taman.",
   },
@@ -191,7 +191,6 @@ function LandingPage() {
             <h2 className="mb-6 font-display text-4xl font-black">Lokasi</h2>
             <div className="panel-kayu rounded-2xl p-6 shadow-lift sm:p-8">
               <p className="font-bold opacity-90">📍 Alamat</p>
-              {/* TODO: ganti dengan alamat asli */}
               <p className="mt-1 opacity-80">
                 Desa Paniaran, Kecamatan Siborongborong, Kabupaten Tapanuli
                 Utara, Sumatera Utara.
@@ -220,7 +219,6 @@ function LandingPage() {
               Hubungi & Ikuti Kami
             </h2>
             <div className="grid grid-cols-3 gap-3">
-              {/* TODO: ganti href dengan link WhatsApp asli, contoh: https://wa.me/62812xxxxxxx */}
               <a
                 href="https://wa.me/6282213079439"
                 target="_blank"
@@ -231,7 +229,6 @@ function LandingPage() {
                 <span className="text-sm font-black">WhatsApp</span>
               </a>
 
-              {/* TODO: ganti href dengan link Instagram asli, contoh: https://instagram.com/sopoharimoting */}
               <a
                 href="https://www.instagram.com/sopo_harimotting?stkn=a3B1b2JoMjk4aWNw"
                 target="_blank"
@@ -242,7 +239,6 @@ function LandingPage() {
                 <span className="text-sm font-black">Instagram</span>
               </a>
 
-              {/* TODO: ganti href dengan link TikTok asli, contoh: https://tiktok.com/@sopoharimoting */}
               <a
                 href="https://www.tiktok.com/@sopoharimottingofficial?_r=1&_t=ZS-99aqjzQvm3Y"
                 target="_blank"

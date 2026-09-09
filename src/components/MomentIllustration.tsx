@@ -1,7 +1,7 @@
 // Ilustrasi kecil bergaya sama dengan hero (siluet + gradasi hangat), dipakai
 // sebagai pengganti kotak "foto belum ada" yang diulang-ulang. Begitu foto asli
 // tersedia, section yang memanggil ini tinggal diganti ke <img>.
-export function MomentIllustration({ variasi }: { variasi: "kuda" | "gazebo" | "warung" }) {
+export function MomentIllustration({ variasi }: { variasi: "kuda" | "kelinci" | "gazebo" | "warung" }) {
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
       <div
@@ -27,6 +27,26 @@ export function MomentIllustration({ variasi }: { variasi: "kuda" | "gazebo" | "
             </g>
           </svg>
         </g>
+      )}
+
+      {variasi === "kelinci" && (
+        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 300 225">
+          <circle cx="230" cy="46" r="18" fill="oklch(0.9 0.14 85)" />
+          <g transform="translate(115,95) scale(2.3)" fill="oklch(0.9 0.02 90)" stroke="oklch(0.22 0.05 42)" strokeWidth="1.2">
+            {/* Telinga */}
+            <ellipse cx="14" cy="6" rx="4" ry="14" transform="rotate(-12 14 6)" />
+            <ellipse cx="26" cy="6" rx="4" ry="14" transform="rotate(12 26 6)" />
+            {/* Badan */}
+            <ellipse cx="20" cy="34" rx="15" ry="12" />
+            {/* Kepala */}
+            <circle cx="20" cy="20" r="11" />
+            {/* Mata */}
+            <circle cx="16" cy="19" r="1.4" fill="oklch(0.22 0.05 42)" stroke="none" />
+            <circle cx="24" cy="19" r="1.4" fill="oklch(0.22 0.05 42)" stroke="none" />
+            {/* Ekor */}
+            <circle cx="34" cy="40" r="3" />
+          </g>
+        </svg>
       )}
 
       {variasi === "gazebo" && (

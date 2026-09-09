@@ -18,6 +18,7 @@ import { Route as AdminLaporanRouteImport } from './routes/admin/laporan'
 import { Route as AdminPengaturanRouteImport } from './routes/admin/pengaturan'
 import { Route as AdminScanRouteImport } from './routes/admin/scan'
 import { Route as AdminStokRouteImport } from './routes/admin/stok'
+import { Route as AdminVerifikasiRouteImport } from './routes/admin/verifikasi'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const AdminStokRoute = AdminStokRouteImport.update({
   path: '/stok',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminVerifikasiRoute = AdminVerifikasiRouteImport.update({
+  id: '/verifikasi',
+  path: '/verifikasi',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/admin/pengaturan': typeof AdminPengaturanRoute
   '/admin/scan': typeof AdminScanRoute
   '/admin/stok': typeof AdminStokRoute
+  '/admin/verifikasi': typeof AdminVerifikasiRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/admin/pengaturan': typeof AdminPengaturanRoute
   '/admin/scan': typeof AdminScanRoute
   '/admin/stok': typeof AdminStokRoute
+  '/admin/verifikasi': typeof AdminVerifikasiRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/admin/pengaturan': typeof AdminPengaturanRoute
   '/admin/scan': typeof AdminScanRoute
   '/admin/stok': typeof AdminStokRoute
+  '/admin/verifikasi': typeof AdminVerifikasiRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/admin/pengaturan'
     | '/admin/scan'
     | '/admin/stok'
+    | '/admin/verifikasi'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/admin/pengaturan'
     | '/admin/scan'
     | '/admin/stok'
+    | '/admin/verifikasi'
     | '/admin'
   id:
     | '__root__'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/admin/pengaturan'
     | '/admin/scan'
     | '/admin/stok'
+    | '/admin/verifikasi'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -204,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStokRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/verifikasi': {
+      id: '/admin/verifikasi'
+      path: '/verifikasi'
+      fullPath: '/admin/verifikasi'
+      preLoaderRoute: typeof AdminVerifikasiRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
   }
 }
 
@@ -213,6 +232,7 @@ interface AdminRouteRouteChildren {
   AdminPengaturanRoute: typeof AdminPengaturanRoute
   AdminScanRoute: typeof AdminScanRoute
   AdminStokRoute: typeof AdminStokRoute
+  AdminVerifikasiRoute: typeof AdminVerifikasiRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -222,6 +242,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminPengaturanRoute: AdminPengaturanRoute,
   AdminScanRoute: AdminScanRoute,
   AdminStokRoute: AdminStokRoute,
+  AdminVerifikasiRoute: AdminVerifikasiRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

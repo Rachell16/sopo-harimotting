@@ -1,24 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { AppShell } from "@/components/AppShell";
-import { buatTiketServer } from "@/lib/tickets.server";
-import { HARGA, LABEL, rupiah, tanggalJam, type Kategori, type Tiket } from "@/lib/tickets";
+import { buatTiketServer, cekStatusTiket } from "@/lib/tickets.server";
+import { ambilQris } from "@/lib/pengaturan.server";
+import {
+  HARGA,
+  LABEL,
+  rupiah,
+  tanggalJam,
+  type Kategori,
+  type MetodeBayarTiket,
+  type Tiket,
+} from "@/lib/tickets";
 
 export const Route = createFileRoute("/kasir")({
   head: () => ({
     meta: [
-      { title: "Kasir Tiket — Sopo Harimoting" },
+      { title: "Beli Tiket — Sopo Harimoting" },
       {
         name: "description",
-        content:
-          "Loket kasir untuk membuat tiket masuk tempat wisata lengkap dengan QR code unik per transaksi.",
-      },
-      { property: "og:title", content: "Kasir Tiket — Sopo Harimoting" },
-      {
-        property: "og:description",
-        content: "Buat tiket masuk dan QR code pengunjung langsung dari loket.",
+        content: "Pesan tiket masuk Sopo Harimoting — bayar cash di kasir atau QRIS.",
       },
     ],
   }),
@@ -28,70 +31,154 @@ export const Route = createFileRoute("/kasir")({
 function KasirPage() {
   const [kategori, setKategori] = useState<Kategori>("dewasa");
   const [jumlah, setJumlah] = useState(1);
-  const [tiket, setTiket] = useState<Tiket | null>(null);
+  const [metode, setMetode] = useState<MetodeBayarTiket | null>(null);
+  const [buktiTf, setBuktiTf] = useState<string | null>(null);
+  const [pesanan, setPesanan] = useState<Tiket | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
+  const { data: qris } = useQuery({
+    queryKey: ["qris"],
+    queryFn: () => ambilQris(),
+    enabled: metode === "qris",
+  });
+
+  // Polling status pesanan — begitu petugas approve/tolak di admin, layar ini
+  // otomatis update sendiri tanpa perlu refresh manual.
+  const { data: statusTerbaru } = useQuery({
+    queryKey: ["status-tiket", pesanan?.kode],
+    queryFn: () => cekStatusTiket({ data: pesanan!.kode }),
+    enabled: !!pesanan,
+    refetchInterval: 3000,
+  });
+  const tiketTampil = statusTerbaru ?? pesanan;
+
   const buatMutation = useMutation({
-    mutationFn: (input: { kategori: Kategori; jumlah: number }) =>
+    mutationFn: (input: { kategori: Kategori; jumlah: number; metode: MetodeBayarTiket; buktiTf: string | null }) =>
       buatTiketServer({ data: input }),
     onSuccess: (tiketBaru) => {
-      setTiket(tiketBaru);
+      setPesanan(tiketBaru);
       queryClient.invalidateQueries({ queryKey: ["tiket"] });
     },
   });
 
+  function pilihFile(file: File | undefined) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setBuktiTf(reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
   const total = HARGA[kategori] * jumlah;
+  const siapKirim = metode === "cash" || (metode === "qris" && !!buktiTf);
 
-  if (tiket) {
-    return (
-      <AppShell title="Tiket Berhasil Dibuat" subtitle="Minta pengunjung memfoto QR ini">
-        <div className="kartu-farm overflow-hidden print:shadow-none">
-          <div className="bg-primary px-4 py-3 text-center text-primary-foreground">
-            <p className="font-display text-2xl font-black">TIKET MASUK</p>
-          </div>
-          <div className="flex flex-col items-center gap-4 p-5">
-            <div className="rounded-2xl border-4 border-wood bg-background p-4">
-              <QRCodeCanvas value={tiket.kode} size={240} level="M" includeMargin={false} />
+  // ---------- Layar status pesanan (setelah submit) ----------
+  if (tiketTampil) {
+    if (tiketTampil.status === "disetujui") {
+      return (
+        <AppShell title="Tiket Aktif!" subtitle="Tunjukkan QR ini di pintu masuk">
+          <div className="kartu-farm overflow-hidden print:shadow-none">
+            <div className="bg-primary px-4 py-3 text-center text-primary-foreground">
+              <p className="font-display text-2xl font-black">TIKET MASUK</p>
             </div>
-            <p className="font-display text-3xl font-black tracking-widest">{tiket.kode}</p>
-
-            <dl className="w-full space-y-2 text-lg">
-              <Baris label="Kategori" nilai={LABEL[tiket.kategori]} />
-              <Baris label="Jumlah" nilai={`${tiket.jumlah} orang`} />
-              <Baris label="Waktu beli" nilai={tanggalJam(tiket.dibuatPada)} />
-              <div className="flex items-center justify-between rounded-xl bg-secondary px-3 py-3">
-                <dt className="text-lg font-bold">Total bayar</dt>
-                <dd className="font-display text-2xl font-black text-primary">
-                  {rupiah(tiket.total)}
-                </dd>
+            <div className="flex flex-col items-center gap-4 p-5">
+              <div className="rounded-2xl border-4 border-wood bg-background p-4">
+                <QRCodeCanvas value={tiketTampil.kode} size={240} level="M" includeMargin={false} />
               </div>
-            </dl>
+              <p className="font-display text-3xl font-black tracking-widest">{tiketTampil.kode}</p>
+              <dl className="w-full space-y-2 text-lg">
+                <Baris label="Kategori" nilai={LABEL[tiketTampil.kategori]} />
+                <Baris label="Jumlah" nilai={`${tiketTampil.jumlah} orang`} />
+                <Baris label="Waktu beli" nilai={tanggalJam(tiketTampil.dibuatPada)} />
+                <div className="flex items-center justify-between rounded-xl bg-secondary px-3 py-3">
+                  <dt className="text-lg font-bold">Total bayar</dt>
+                  <dd className="font-display text-2xl font-black text-primary">
+                    {rupiah(tiketTampil.total)}
+                  </dd>
+                </div>
+              </dl>
+            </div>
           </div>
-        </div>
 
-        <div className="mt-5 grid gap-3 print:hidden">
-          <button
-            onClick={() => window.print()}
-            className="rounded-2xl border-4 border-wood bg-card px-4 py-4 text-xl font-black text-wood-dark shadow-farm active:translate-y-0.5"
-          >
-            🖨️ Cetak Tiket
-          </button>
+          <div className="mt-5 grid gap-3 print:hidden">
+            <button
+              onClick={() => window.print()}
+              className="rounded-2xl border-4 border-wood bg-card px-4 py-4 text-xl font-black text-wood-dark shadow-farm active:translate-y-0.5"
+            >
+              🖨️ Cetak Tiket
+            </button>
+            <button
+              onClick={() => {
+                setPesanan(null);
+                setMetode(null);
+                setBuktiTf(null);
+                setJumlah(1);
+              }}
+              className="rounded-2xl bg-accent px-4 py-5 text-2xl font-black text-accent-foreground shadow-lift active:translate-y-0.5"
+            >
+              ➕ Transaksi Baru
+            </button>
+          </div>
+        </AppShell>
+      );
+    }
+
+    if (tiketTampil.status === "ditolak") {
+      return (
+        <AppShell title="Pesanan Ditolak" subtitle="Pembayaran tidak terverifikasi">
+          <div className="kartu-farm p-6 text-center">
+            <span className="text-5xl">❌</span>
+            <p className="mt-3 font-display text-xl font-black">
+              Pesanan {tiketTampil.kode} ditolak petugas
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              Kemungkinan pembayaran belum diterima atau bukti transfer kurang jelas. Coba pesan
+              ulang atau tanya langsung ke petugas.
+            </p>
+          </div>
           <button
             onClick={() => {
-              setTiket(null);
-              setJumlah(1);
+              setPesanan(null);
+              setMetode(null);
+              setBuktiTf(null);
             }}
-            className="rounded-2xl bg-accent px-4 py-5 text-2xl font-black text-accent-foreground shadow-lift active:translate-y-0.5"
+            className="mt-5 w-full rounded-2xl bg-accent px-4 py-5 text-center font-display text-xl font-black text-accent-foreground shadow-lift"
           >
-            ➕ Transaksi Baru
+            Pesan Ulang
           </button>
+        </AppShell>
+      );
+    }
+
+    // status === "menunggu"
+    return (
+      <AppShell title="Menunggu Konfirmasi" subtitle="Pesanan kamu sedang diverifikasi petugas">
+        <div className="kartu-farm p-6 text-center">
+          <span className="text-5xl">⏳</span>
+          <p className="mt-3 font-display text-2xl font-black tracking-widest">{tiketTampil.kode}</p>
+          <dl className="mt-4 space-y-2 text-left text-lg">
+            <Baris label="Kategori" nilai={`${LABEL[tiketTampil.kategori]} × ${tiketTampil.jumlah}`} />
+            <Baris label="Metode" nilai={tiketTampil.metode === "qris" ? "QRIS" : "Cash"} />
+            <div className="flex items-center justify-between rounded-xl bg-secondary px-3 py-3">
+              <dt className="text-lg font-bold">Total</dt>
+              <dd className="font-display text-2xl font-black text-primary">
+                {rupiah(tiketTampil.total)}
+              </dd>
+            </div>
+          </dl>
+          <p className="mt-4 text-sm font-bold text-muted-foreground">
+            {tiketTampil.metode === "cash"
+              ? "Silakan bayar cash ke petugas kasir. Halaman ini otomatis update begitu dikonfirmasi."
+              : "Bukti transfer sudah dikirim. Halaman ini otomatis update begitu petugas verifikasi."}
+          </p>
         </div>
       </AppShell>
     );
   }
 
+  // ---------- Layar pilih tiket & bayar ----------
   return (
-    <AppShell title="Loket Kasir" subtitle="Buat tiket masuk pengunjung">
+    <AppShell title="Beli Tiket" subtitle="Pesan tiket masuk pengunjung">
       <div className="kartu-farm p-5">
         <p className="mb-3 text-lg font-black">Kategori Tiket</p>
         <div className="grid grid-cols-2 gap-3">
@@ -144,19 +231,95 @@ function KasirPage() {
           <span className="text-xl font-black">Total</span>
           <span className="font-display text-3xl font-black text-primary">{rupiah(total)}</span>
         </div>
+
+        <p className="mt-6 mb-3 text-lg font-black">Metode Bayar</p>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => {
+              setMetode("cash");
+              setBuktiTf(null);
+            }}
+            className={`rounded-2xl border-4 px-3 py-4 text-center font-display text-lg font-black transition ${
+              metode === "cash"
+                ? "border-primary bg-primary text-primary-foreground shadow-lift"
+                : "border-border bg-background text-foreground"
+            }`}
+          >
+            💵 Cash
+          </button>
+          <button
+            onClick={() => setMetode("qris")}
+            className={`rounded-2xl border-4 px-3 py-4 text-center font-display text-lg font-black transition ${
+              metode === "qris"
+                ? "border-primary bg-primary text-primary-foreground shadow-lift"
+                : "border-border bg-background text-foreground"
+            }`}
+          >
+            📱 QRIS
+          </button>
+        </div>
+
+        {metode === "cash" ? (
+          <p className="mt-4 text-sm font-bold text-muted-foreground">
+            Bayar cash langsung ke petugas kasir. Tiket aktif setelah petugas konfirmasi uang
+            diterima.
+          </p>
+        ) : null}
+
+        {metode === "qris" ? (
+          <div className="mt-4">
+            {qris ? (
+              <img
+                src={qris}
+                alt="Kode QRIS"
+                className="mx-auto h-52 w-52 rounded-2xl border-4 border-wood bg-white object-contain p-2"
+              />
+            ) : (
+              <p className="text-center text-sm font-bold text-muted-foreground">
+                QRIS belum tersedia, tanya petugas ya.
+              </p>
+            )}
+            <p className="mt-3 text-center text-sm font-bold text-muted-foreground">
+              Scan & bayar, lalu upload bukti transfernya di bawah ini.
+            </p>
+
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => pilihFile(e.target.files?.[0])}
+            />
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="mt-3 w-full rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
+            >
+              {buktiTf ? "✅ Bukti Transfer Terpilih" : "📁 Upload Bukti Transfer"}
+            </button>
+            {buktiTf ? (
+              <img src={buktiTf} alt="Preview bukti transfer" className="mt-3 max-h-40 w-full rounded-xl object-contain" />
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <button
-        onClick={() => buatMutation.mutate({ kategori, jumlah })}
-        disabled={buatMutation.isPending}
-        className="mt-5 w-full rounded-2xl bg-accent px-4 py-6 font-display text-3xl font-black text-accent-foreground shadow-lift transition active:translate-y-0.5 disabled:opacity-60"
+        onClick={() => metode && buatMutation.mutate({ kategori, jumlah, metode, buktiTf })}
+        disabled={!metode || !siapKirim || buatMutation.isPending}
+        className="mt-5 w-full rounded-2xl bg-accent px-4 py-6 font-display text-2xl font-black text-accent-foreground shadow-lift transition active:translate-y-0.5 disabled:opacity-60"
       >
-        {buatMutation.isPending ? "Membuat..." : "Buat Tiket"}
+        {buatMutation.isPending
+          ? "Mengirim..."
+          : !metode
+            ? "Pilih Metode Bayar Dulu"
+            : metode === "qris" && !buktiTf
+              ? "Upload Bukti Transfer Dulu"
+              : "Kirim Pesanan"}
       </button>
 
       {buatMutation.isError ? (
         <p className="mt-3 text-center font-bold text-destructive">
-          Gagal membuat tiket. Cek koneksi lalu coba lagi.
+          Gagal membuat pesanan. Cek koneksi lalu coba lagi.
         </p>
       ) : null}
 

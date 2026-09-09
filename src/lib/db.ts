@@ -27,6 +27,12 @@ export async function pastikanSkema() {
       dipakai_pada TIMESTAMPTZ
     )
   `;
+  // Kolom tambahan buat alur "pesan dulu, di-approve petugas baru aktif".
+  // ADD COLUMN IF NOT EXISTS aman dipanggil berkali-kali & gak ganggu data lama —
+  // tiket lama otomatis dianggap 'disetujui' (default) biar tetap valid kayak sebelumnya.
+  await sql`ALTER TABLE tiket ADD COLUMN IF NOT EXISTS metode TEXT NOT NULL DEFAULT 'cash'`;
+  await sql`ALTER TABLE tiket ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'disetujui'`;
+  await sql`ALTER TABLE tiket ADD COLUMN IF NOT EXISTS bukti_tf TEXT`;
   await sql`
     CREATE TABLE IF NOT EXISTS produk (
       kode TEXT PRIMARY KEY,

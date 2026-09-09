@@ -166,22 +166,36 @@ function ScanPage() {
 
 function HasilPanel({ hasil, onLanjut }: { hasil: HasilScan; onLanjut: () => void }) {
   const valid = hasil.status === "valid";
+  const peringatan = hasil.status === "belum-disetujui";
   const judul =
     hasil.status === "valid"
       ? "BOLEH MASUK"
       : hasil.status === "terpakai"
         ? "TIKET SUDAH DIGUNAKAN"
-        : "TIKET TIDAK DITEMUKAN";
+        : hasil.status === "belum-disetujui"
+          ? "PEMBAYARAN BELUM DIVERIFIKASI"
+          : hasil.status === "ditolak"
+            ? "PESANAN DITOLAK"
+            : "TIKET TIDAK DITEMUKAN";
 
   return (
     <div className="space-y-4">
       <div
         className={`rounded-3xl px-4 py-10 text-center shadow-lift ${
-          valid ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"
+          valid
+            ? "bg-success text-success-foreground"
+            : peringatan
+              ? "bg-accent text-accent-foreground"
+              : "bg-destructive text-destructive-foreground"
         }`}
       >
-        <span className="text-7xl">{valid ? "✅" : "⛔"}</span>
+        <span className="text-7xl">{valid ? "✅" : peringatan ? "⏳" : "⛔"}</span>
         <p className="mt-3 font-display text-4xl leading-tight font-black">{judul}</p>
+        {peringatan ? (
+          <p className="mt-2 text-base font-bold opacity-90">
+            Cek & setujui dulu di halaman Verifikasi sebelum tiket ini bisa dipakai masuk.
+          </p>
+        ) : null}
       </div>
 
       <div className="kartu-farm p-5 text-lg">

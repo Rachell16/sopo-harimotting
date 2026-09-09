@@ -1,4 +1,6 @@
 export type Kategori = "dewasa" | "anak";
+export type MetodeBayarTiket = "cash" | "qris";
+export type StatusTiket = "menunggu" | "disetujui" | "ditolak";
 
 export const HARGA: Record<Kategori, number> = {
   dewasa: 5000,
@@ -15,6 +17,9 @@ export type Tiket = {
   kategori: Kategori;
   jumlah: number;
   total: number;
+  metode: MetodeBayarTiket;
+  status: StatusTiket;
+  buktiTf: string | null; // data URL base64, cuma diisi kalau metode = qris
   dibuatPada: string; // ISO
   dipakaiPada: string | null;
 };
@@ -29,6 +34,8 @@ export function kodeAcak() {
 export type HasilScan =
   | { status: "valid"; tiket: Tiket }
   | { status: "terpakai"; tiket: Tiket }
+  | { status: "belum-disetujui"; tiket: Tiket }
+  | { status: "ditolak"; tiket: Tiket }
   | { status: "tidak-ditemukan"; kode: string };
 
 // Catatan: penyimpanan data (buat tiket, validasi tiket, ambil semua tiket)

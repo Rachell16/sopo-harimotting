@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MENU_ADMIN } from "@/lib/admin-menu";
@@ -51,10 +51,10 @@ function LaporanPage() {
     return batas;
   }, [filter]);
 
-  const tiket = useMemo(
-    () => (batasWaktu ? semuaTiket.filter((t) => new Date(t.dibuatPada) >= batasWaktu) : semuaTiket),
-    [semuaTiket, batasWaktu],
-  );
+  const tiket = useMemo(() => {
+    const disetujui = semuaTiket.filter((t) => t.status === "disetujui");
+    return batasWaktu ? disetujui.filter((t) => new Date(t.dibuatPada) >= batasWaktu) : disetujui;
+  }, [semuaTiket, batasWaktu]);
   const jajanan = useMemo(
     () => (batasWaktu ? semuaJajanan.filter((p) => new Date(p.waktu) >= batasWaktu) : semuaJajanan),
     [semuaJajanan, batasWaktu],
@@ -66,6 +66,7 @@ function LaporanPage() {
   const totalTiketUang = tiket.reduce((a, t) => a + t.total, 0);
   const totalJajananUang = jajanan.reduce((a, p) => a + p.total, 0);
   const totalGabungan = totalTiketUang + totalJajananUang;
+  const jumlahMenunggu = semuaTiket.filter((t) => t.status === "menunggu").length;
 
   return (
     <AppShell
@@ -74,7 +75,17 @@ function LaporanPage() {
       label="Sopo Harimoting · Admin"
       menu={MENU_ADMIN}
     >
-      {/* Ringkasan gabungan — kayak "saldo" di mbanking */}
+      {jumlahMenunggu > 0 ? (
+        <Link
+          to="/admin/verifikasi"
+          className="mb-4 flex items-center justify-between rounded-2xl bg-accent px-4 py-3 font-black text-accent-foreground shadow-farm"
+        >
+          <span>⏳ {jumlahMenunggu} pesanan menunggu verifikasi</span>
+          <span>Cek →</span>
+        </Link>
+      ) : null}
+
+      {/* Ringkasan gabungan — kayak "saldo" di mbanking, cuma yang udah disetujui */}
       <div className="panel-kayu rounded-2xl p-5 text-center shadow-lift">
         <p className="text-sm font-bold uppercase tracking-wide opacity-75">
           Total Pendapatan · {FILTER.find((f) => f.id === filter)?.label}

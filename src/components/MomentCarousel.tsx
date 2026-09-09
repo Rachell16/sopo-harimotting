@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { MomentIllustration } from "./MomentIllustration";
 
 export type SlideMomen = {
-  variasi: "kuda" | "gazebo" | "warung";
+  variasi: "kuda" | "kelinci" | "gazebo" | "warung";
   judul: string;
   teks: string;
 };
