@@ -1,0 +1,333 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Nunito", system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-wood: var(--wood);
+  --color-wood-dark: var(--wood-dark);
+  --color-cream: var(--cream);
+  --color-sun: var(--sun);
+  --color-sun-deep: var(--sun-deep);
+  --color-sky: var(--sky);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --shadow-farm: 0 10px 24px -12px oklch(0.35 0.06 60 / 0.45);
+  --shadow-lift: 0 18px 40px -18px oklch(0.35 0.08 60 / 0.55);
+}
+
+:root {
+  --radius: 1rem;
+  --background: oklch(0.965 0.018 80);
+  --foreground: oklch(0.22 0.03 50);
+  --card: oklch(0.99 0.01 85);
+  --card-foreground: oklch(0.22 0.03 50);
+  --popover: oklch(0.99 0.01 85);
+  --popover-foreground: oklch(0.22 0.03 50);
+  --primary: oklch(0.32 0.07 155);
+  --primary-foreground: oklch(0.98 0.012 95);
+  --secondary: oklch(0.89 0.03 85);
+  --secondary-foreground: oklch(0.28 0.05 55);
+  --muted: oklch(0.92 0.022 85);
+  --muted-foreground: oklch(0.44 0.03 60);
+  --accent: oklch(0.74 0.14 75);
+  --accent-foreground: oklch(0.24 0.05 55);
+  --destructive: oklch(0.53 0.2 27);
+  --destructive-foreground: oklch(0.98 0.01 95);
+  --border: oklch(0.84 0.03 80);
+  --input: oklch(0.86 0.028 80);
+  --ring: oklch(0.32 0.07 155);
+  --wood: oklch(0.4 0.09 42);
+  --wood-dark: oklch(0.22 0.045 40);
+  --cream: oklch(0.96 0.025 88);
+  --sun: oklch(0.78 0.15 75);
+  --sun-deep: oklch(0.64 0.17 48);
+  --sky: oklch(0.82 0.07 230);
+  --success: oklch(0.5 0.14 148);
+  --success-foreground: oklch(0.98 0.01 95);
+}
+
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(oklch(0.32 0.07 155 / 0.05) 1px, transparent 1px),
+      radial-gradient(
+        ellipse 900px 500px at 50% 0%,
+        color-mix(in oklab, var(--sun) 16%, transparent) 0%,
+        transparent 70%
+      );
+    background-size: 22px 22px, 100% 100%;
+    background-attachment: fixed, scroll;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility panel-kayu {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--wood) 92%, black) 0%,
+    var(--wood-dark) 100%
+  );
+  color: var(--cream);
+}
+
+@utility kartu-farm {
+  background-color: var(--card);
+  border: 2px solid color-mix(in oklab, var(--wood) 35%, transparent);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-farm);
+}
+
+/* ---------- Hero scene (landing page) ---------- */
+
+@keyframes langit-hanyut {
+  from { transform: translateX(0); }
+  to { transform: translateX(-140px); }
+}
+
+@keyframes matahari-nafas {
+  0%, 100% { filter: drop-shadow(0 0 28px oklch(0.82 0.17 82 / 0.55)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 44px oklch(0.82 0.17 82 / 0.8)); transform: scale(1.04); }
+}
+
+@keyframes rumput-goyang {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(2.5deg); }
+}
+
+@keyframes debu-mengambang {
+  0% { transform: translate(0, 0); opacity: 0; }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.5; }
+  100% { transform: translate(14px, -60px); opacity: 0; }
+}
+
+@keyframes hero-muncul {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-anim-langit { animation: langit-hanyut 40s linear infinite alternate; }
+.hero-anim-matahari { animation: matahari-nafas 5s ease-in-out infinite; transform-origin: center; }
+.hero-anim-rumput { animation: rumput-goyang 3.6s ease-in-out infinite; transform-origin: bottom center; }
+.hero-anim-debu { animation: debu-mengambang 7s ease-in infinite; }
+
+.hero-muncul {
+  animation: hero-muncul 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ---------- Scroll reveal (satu perlakuan konsisten untuk semua section) ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-tampil {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Bingkai foto (placeholder & nanti foto asli) ---------- */
+
+@utility bingkai-foto {
+  position: relative;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(
+    155deg,
+    color-mix(in oklab, var(--sun) 55%, var(--cream)) 0%,
+    color-mix(in oklab, var(--wood) 45%, var(--cream)) 55%,
+    color-mix(in oklab, var(--primary) 30%, var(--cream)) 100%
+  );
+  border: 3px solid var(--card);
+  outline: 2px solid color-mix(in oklab, var(--wood) 40%, transparent);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-farm);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+@utility bingkai-foto-hover {
+  &:hover {
+    transform: translateY(-4px) rotate(0deg) !important;
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+/* ---------- Hero — kabut & burung, gerakan lebih dramatis ---------- */
+
+@keyframes zoom-perlahan {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+@keyframes burung-terbang {
+  0% { transform: translate(-10vw, 0); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.7; }
+  100% { transform: translate(110vw, -40px); opacity: 0; }
+}
+
+@keyframes cuit-turun {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+.hero-anim-zoom { animation: zoom-perlahan 22s ease-out infinite alternate; }
+.hero-anim-burung { animation: burung-terbang linear infinite; }
+.hero-anim-cuit { animation: cuit-turun 1.6s ease-in-out infinite; }
+
+/* ---------- Divider emas — pemisah section yang bermakna sebagai jahitan tiket ---------- */
+
+@utility garis-emas {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--sun) 70%, var(--wood)) 50%,
+    transparent 100%
+  );
+}
+
+/* ---------- Kartu tiket bergerigi — dipakai buat harga & hal yang relevan dgn "tiket" ---------- */
+
+@utility kartu-tiket {
+  position: relative;
+  background-color: var(--card);
+  border: 2px dashed color-mix(in oklab, var(--wood) 45%, transparent);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-farm);
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    background: var(--color-background);
+    border-radius: 999px;
+    transform: translateY(-50%);
+  }
+  &::before { left: -11px; }
+  &::after { right: -11px; }
+}
+
+/* ---------- Ambient: daun melayang di seluruh halaman ---------- */
+
+@keyframes daun-melayang {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+  8% { opacity: 0.9; }
+  92% { opacity: 0.8; }
+  100% { transform: translateY(115vh) translateX(40px) rotate(320deg); opacity: 0; }
+}
+
+.daun-melayang {
+  animation: daun-melayang linear infinite;
+}
+
+/* ---------- Pop-up lightbox (galeri) ---------- */
+
+@keyframes popup-masuk {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popup-zoom {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ---------- Glow lembut yang berdenyut di CTA utama ---------- */
+
+@keyframes cta-berdenyut {
+  0%, 100% { box-shadow: var(--shadow-lift), 0 0 0 0 color-mix(in oklab, var(--accent) 55%, transparent); }
+  50% { box-shadow: var(--shadow-lift), 0 0 0 10px color-mix(in oklab, var(--accent) 0%, transparent); }
+}
+
+.cta-berdenyut {
+  animation: cta-berdenyut 2.6s ease-out infinite;
+}
+
+/* ---------- Ikon fasilitas: ayunan halus saat idle ---------- */
+
+@keyframes ikon-ayun {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+.ikon-ayun {
+  display: inline-block;
+  animation: ikon-ayun 3s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+
