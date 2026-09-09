@@ -17,7 +17,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Sopo Harimoting — Wisata Keluarga" },
       {
         property: "og:description",
-        content: "Wisata keluarga dengan area kuda, taman, gazebo piknik, dan jajanan.",
+        content:
+          "Wisata keluarga dengan area kuda, taman, gazebo piknik, dan jajanan.",
       },
     ],
   }),
@@ -25,18 +26,54 @@ export const Route = createFileRoute("/")({
 });
 
 const FASILITAS = [
-  { ikon: "🐴", judul: "Naik & Lihat Kuda", teks: "Area kuda dan patung-patung hewan di taman, jadi spot favorit anak-anak." },
-  { ikon: "🌳", judul: "Taman Terbuka", teks: "Rumput luas dan sejuk, cocok digelar tikar buat piknik keluarga." },
-  { ikon: "🏕️", judul: "Gazebo Piknik", teks: "Tempat duduk teduh beratap jaring, nyaman buat istirahat sambil ngobrol." },
-  { ikon: "🎪", judul: "Area Bermain", teks: "Rintangan ban warna-warni yang seru buat anak-anak berlari dan memanjat." },
-  { ikon: "🛍️", judul: "Warung & Jajanan", teks: "Aneka snack dan minuman dingin tersedia langsung di lokasi." },
-  { ikon: "📸", judul: "Spot Foto", teks: "Banyak sudut menarik yang sayang dilewatkan buat foto keluarga." },
+  {
+    ikon: "🐴",
+    judul: "Lihat Kuda",
+    teks: "Area kuda dan patung-patung hewan di taman, jadi spot favorit anak-anak.",
+  },
+  {
+    ikon: "🌳",
+    judul: "Taman Terbuka",
+    teks: "Rumput luas dan sejuk, cocok digelar tikar buat piknik keluarga.",
+  },
+  {
+    ikon: "🏕️",
+    judul: "Gazebo Piknik",
+    teks: "Tempat duduk teduh beratap jaring, nyaman buat istirahat sambil ngobrol.",
+  },
+  {
+    ikon: "🎪",
+    judul: "Area Bermain",
+    teks: "Rintangan dan rumah pohon yang seru buat anak-anak berlari dan memanjat.",
+  },
+  {
+    ikon: "🛍️",
+    judul: "Warung & Jajanan",
+    teks: "Aneka snack dan minuman dingin tersedia langsung di lokasi.",
+  },
+  {
+    ikon: "📸",
+    judul: "Spot Foto",
+    teks: "Banyak sudut menarik yang sayang dilewatkan buat foto keluarga.",
+  },
 ];
 
 const MOMEN: SlideMomen[] = [
-  { variasi: "kuda", judul: "Dekat dengan Kuda", teks: "Lihat langsung, ajak anak berkenalan dengan kuda-kuda di taman." },
-  { variasi: "gazebo", judul: "Piknik di Gazebo", teks: "Duduk santai di bawah gazebo beratap jaring sambil menikmati udara terbuka." },
-  { variasi: "warung", judul: "Jajan di Warung", teks: "Lapar atau haus? Warung kecil kami siap dengan aneka jajanan dan minuman dingin." },
+  {
+    variasi: "Kelinci",
+    judul: "Dekat dengan Kelinci",
+    teks: "Lihat langsung, ajak anak berkenalan dengan kelinci di taman.",
+  },
+  {
+    variasi: "gazebo",
+    judul: "Piknik di Gazebo",
+    teks: "Duduk santai di bawah gazebo beratap jaring sambil menikmati udara terbuka.",
+  },
+  {
+    variasi: "warung",
+    judul: "Jajan di Warung",
+    teks: "Lapar atau haus? Warung kecil kami siap dengan aneka jajanan dan minuman dingin.",
+  },
 ];
 
 function LandingPage() {
@@ -83,15 +120,17 @@ function LandingPage() {
             </h2>
             <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
               {/* TODO: ganti dengan deskripsi asli tempat wisata */}
-              Sopo Harimoting adalah tempat wisata keluarga dengan suasana alam terbuka, area
-              kuda, taman, dan tempat piknik yang nyaman. Cocok untuk liburan bersama keluarga
-              maupun rombongan.
+              Sopo Harimoting adalah tempat wisata keluarga dengan suasana alam
+              terbuka, area kuda, taman, dan tempat piknik yang nyaman. Cocok
+              untuk liburan bersama keluarga maupun rombongan.
             </p>
           </Reveal>
 
           {/* MOMEN — carousel, bisa di-slide & diklik buat pop-up */}
           <Reveal className="mb-16">
-            <h2 className="mb-1 font-display text-4xl font-black">Momen di Sini</h2>
+            <h2 className="mb-1 font-display text-4xl font-black">
+              Momen di Sini
+            </h2>
             <p className="mb-6 text-muted-foreground">
               Geser atau klik foto untuk lihat lebih besar — foto asli menyusul.
             </p>
@@ -115,7 +154,9 @@ function LandingPage() {
                   </span>
                   <div>
                     <p className="font-display text-xl font-black">{f.judul}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{f.teks}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {f.teks}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -124,7 +165,9 @@ function LandingPage() {
 
           {/* HARGA TIKET — gaya kartu tiket bergerigi */}
           <Reveal className="mb-16">
-            <h2 className="mb-6 font-display text-4xl font-black">Harga Tiket Masuk</h2>
+            <h2 className="mb-6 font-display text-4xl font-black">
+              Harga Tiket Masuk
+            </h2>
             <div className="grid grid-cols-2 gap-6">
               <div className="kartu-tiket p-5 text-center transition hover:-translate-y-1">
                 <span className="text-3xl">🧑‍🌾</span>
@@ -150,8 +193,8 @@ function LandingPage() {
               <p className="font-bold opacity-90">📍 Alamat</p>
               {/* TODO: ganti dengan alamat asli */}
               <p className="mt-1 opacity-80">
-                Isi alamat lengkap Sopo Harimoting di sini (jalan, desa/kelurahan, kecamatan,
-                kabupaten/kota, provinsi).
+                Desa Paniaran, Kecamatan Siborongborong, Kabupaten Tapanuli
+                Utara, Sumatera Utara.
               </p>
 
               <div className="garis-emas my-5 w-full opacity-40" />
@@ -161,7 +204,7 @@ function LandingPage() {
               <p className="mt-1 opacity-80">Setiap hari, 08.00 – 17.00 WIB</p>
 
               <a
-                href="https://www.google.com/maps"
+                href="https://www.google.com/maps/place/SOPO+HARIMOTTING/@2.1591974,98.9714991,17z/data=!3m1!4b1!4m6!3m5!1s0x302e130054edefdd:0x2806ff1165998444!8m2!3d2.159192!4d98.974074!16s%2Fg%2F11nqq_sdv6?entry=ttu&g_ep=EgoyMDI2MDkwMi4wIKXMDSoASAFQAw%3D%3D"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-6 block w-full rounded-2xl bg-accent px-4 py-4 text-center text-lg font-black text-accent-foreground transition hover:-translate-y-0.5"
@@ -172,7 +215,10 @@ function LandingPage() {
           </Reveal>
 
           <div className="mt-10 text-center">
-            <Link to="/admin/scan" className="text-sm font-bold text-muted-foreground underline">
+            <Link
+              to="/admin/scan"
+              className="text-sm font-bold text-muted-foreground underline"
+            >
               Masuk sebagai petugas/admin →
             </Link>
           </div>
