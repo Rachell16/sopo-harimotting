@@ -150,18 +150,17 @@ function LandingPage() {
               <p className="font-bold opacity-90">📍 Alamat</p>
               {/* TODO: ganti dengan alamat asli */}
               <p className="mt-1 opacity-80">
-                Isi alamat lengkap Sopo Harimoting di sini (jalan, desa/kelurahan, kecamatan,
-                kabupaten/kota, provinsi).
+                Desa Paniaran, Kecamatan Siborongborong, Kabupaten Tapanuli Utara, Sumatera Utara
               </p>
 
               <div className="garis-emas my-5 w-full opacity-40" />
 
               <p className="font-bold opacity-90">🕘 Jam Operasional</p>
               {/* TODO: ganti dengan jam operasional asli */}
-              <p className="mt-1 opacity-80">Setiap hari, 08.00 – 17.00 WIB</p>
+              <p className="mt-1 opacity-80">Setiap hari, 12.00 – 18.00 WIB</p>
 
               <a
-                href="https://www.google.com/maps"
+                href="https://www.google.com/maps/place/SOPO+HARIMOTTING/@2.1591974,98.9714991,17z/data=!3m1!4b1!4m6!3m5!1s0x302e130054edefdd:0x2806ff1165998444!8m2!3d2.159192!4d98.974074!16s%2Fg%2F11nqq_sdv6?entry=ttu&g_ep=EgoyMDI2MDkwMi4wIKXMDSoASAFQAw%3D%3D"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-6 block w-full rounded-2xl bg-accent px-4 py-4 text-center text-lg font-black text-accent-foreground transition hover:-translate-y-0.5"

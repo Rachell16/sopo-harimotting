@@ -1,8 +1,8 @@
 export type Kategori = "dewasa" | "anak";
 
 export const HARGA: Record<Kategori, number> = {
-  dewasa: 25000,
-  anak: 15000,
+  dewasa: 5000,
+  anak: 5000,
 };
 
 export const LABEL: Record<Kategori, string> = {
