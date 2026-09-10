@@ -39,13 +39,13 @@ function LoginPage() {
           </Link>
 
           <Link
-            to="/absen"
+            to="/karyawan"
             className="kartu-farm flex items-center gap-4 p-5 text-left transition hover:-translate-y-1 hover:shadow-lift"
           >
             <span className="text-4xl">👷</span>
             <div>
               <p className="font-display text-xl font-black">Petugas / Karyawan</p>
-              <p className="text-sm text-muted-foreground">Absen masuk & keluar pakai PIN + foto</p>
+              <p className="text-sm text-muted-foreground">Login PIN, lihat dashboard & absen pribadi</p>
             </div>
           </Link>
         </div>

@@ -139,58 +139,69 @@ export const hapusKaryawan = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// ---------- Absensi (dipakai karyawan lewat HP masing-masing) ----------
+// ---------- Absensi (dipakai karyawan lewat dashboard pribadi masing-masing) ----------
 
-// Karyawan masukin PIN mereka. Kalau lagi gak ada sesi absen yang masih
-// terbuka (belum absen keluar), sistem otomatis absen MASUK. Kalau ada,
-// otomatis absen KELUAR. Jadi 1 tombol aja, gak perlu pilih menu.
-export const absenDenganPin = createServerFn({ method: "POST" })
-  .validator((data: { pin: string; foto: string }) => data)
-  .handler(async ({ data: { pin, foto } }): Promise<{ karyawan: Karyawan; aksi: "masuk" | "keluar" }> => {
+// Langkah 1: karyawan login pakai PIN. Kalau cocok, kembalikan datanya (buat
+// disimpan di sessionStorage sebagai sesi) — belum melakukan absen apa pun.
+export const loginKaryawan = createServerFn({ method: "POST" })
+  .validator((pin: string) => pin)
+  .handler(async ({ data: pin }): Promise<Karyawan> => {
     if (MODE_DEMO) {
       const k = karyawanDemo.find((k) => k.pin === pin && k.aktif);
       if (!k) throw new Error("PIN tidak dikenali");
-      const sesiTerbuka = absensiDemo.find((a) => a.karyawanKode === k.kode && !a.keluar);
+      return k;
+    }
+
+    await pastikanSkema();
+    const rows = (await sql`
+      SELECT * FROM karyawan WHERE pin = ${pin} AND aktif = true
+    `) as BarisKaryawan[];
+    if (rows.length === 0) throw new Error("PIN tidak dikenali");
+    return barisKeKaryawan(rows[0]!);
+  });
+
+// Langkah 2: dari dashboard pribadi (udah login), karyawan absen pakai kode
+// mereka sendiri (bukan PIN lagi) + foto. Otomatis MASUK kalau belum ada sesi
+// terbuka, atau KELUAR kalau ada.
+export const absenDenganKode = createServerFn({ method: "POST" })
+  .validator((data: { kode: string; foto: string }) => data)
+  .handler(async ({ data: { kode, foto } }): Promise<{ aksi: "masuk" | "keluar" }> => {
+    if (MODE_DEMO) {
+      const sesiTerbuka = absensiDemo.find((a) => a.karyawanKode === kode && !a.keluar);
       if (sesiTerbuka) {
         sesiTerbuka.keluar = new Date().toISOString();
         sesiTerbuka.fotoKeluar = foto;
-        return { karyawan: k, aksi: "keluar" };
+        return { aksi: "keluar" };
       }
       absensiDemo.unshift({
         kode: buatKode("ABS"),
-        karyawanKode: k.kode,
+        karyawanKode: kode,
         masuk: new Date().toISOString(),
         fotoMasuk: foto,
         keluar: null,
         fotoKeluar: null,
       });
-      return { karyawan: k, aksi: "masuk" };
+      return { aksi: "masuk" };
     }
 
     await pastikanSkema();
-    const karyawanRows = (await sql`
-      SELECT * FROM karyawan WHERE pin = ${pin} AND aktif = true
-    `) as BarisKaryawan[];
-    if (karyawanRows.length === 0) throw new Error("PIN tidak dikenali");
-    const karyawan = barisKeKaryawan(karyawanRows[0]!);
-
     const terbuka = (await sql`
-      SELECT * FROM absensi WHERE karyawan_kode = ${karyawan.kode} AND keluar IS NULL
+      SELECT * FROM absensi WHERE karyawan_kode = ${kode} AND keluar IS NULL
       ORDER BY masuk DESC LIMIT 1
     `) as BarisAbsensi[];
 
     if (terbuka.length > 0) {
       await sql`UPDATE absensi SET keluar = now(), foto_keluar = ${foto} WHERE kode = ${terbuka[0]!.kode}`;
-      return { karyawan, aksi: "keluar" };
+      return { aksi: "keluar" };
     }
 
     await sql`
-      INSERT INTO absensi (kode, karyawan_kode, foto_masuk) VALUES (${buatKode("ABS")}, ${karyawan.kode}, ${foto})
+      INSERT INTO absensi (kode, karyawan_kode, foto_masuk) VALUES (${buatKode("ABS")}, ${kode}, ${foto})
     `;
-    return { karyawan, aksi: "masuk" };
+    return { aksi: "masuk" };
   });
 
-// Ambil semua riwayat absensi — dipakai manager buat rekap.
+// Ambil semua riwayat absensi — dipakai manager buat rekap semua karyawan.
 export const ambilAbsensi = createServerFn({ method: "GET" }).handler(async (): Promise<Absensi[]> => {
   if (MODE_DEMO) return [...absensiDemo];
 
@@ -198,3 +209,17 @@ export const ambilAbsensi = createServerFn({ method: "GET" }).handler(async (): 
   const rows = (await sql`SELECT * FROM absensi ORDER BY masuk DESC`) as BarisAbsensi[];
   return rows.map(barisKeAbsensi);
 });
+
+// Ambil riwayat absensi 1 karyawan aja — dipakai di dashboard pribadi mereka
+// (gak perlu ngirim data karyawan lain ke HP mereka).
+export const ambilAbsensiKaryawan = createServerFn({ method: "GET" })
+  .validator((kode: string) => kode)
+  .handler(async ({ data: kode }): Promise<Absensi[]> => {
+    if (MODE_DEMO) return absensiDemo.filter((a) => a.karyawanKode === kode);
+
+    await pastikanSkema();
+    const rows = (await sql`
+      SELECT * FROM absensi WHERE karyawan_kode = ${kode} ORDER BY masuk DESC
+    `) as BarisAbsensi[];
+    return rows.map(barisKeAbsensi);
+  });

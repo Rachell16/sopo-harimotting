@@ -10,8 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AbsenRouteImport } from './routes/absen'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as KaryawanRouteRouteImport } from './routes/karyawan/route'
 import { Route as KasirRouteImport } from './routes/kasir'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ManagerRouteRouteImport } from './routes/manager/route'
@@ -22,6 +22,7 @@ import { Route as AdminPengaturanRouteImport } from './routes/admin/pengaturan'
 import { Route as AdminScanRouteImport } from './routes/admin/scan'
 import { Route as AdminStokRouteImport } from './routes/admin/stok'
 import { Route as AdminVerifikasiRouteImport } from './routes/admin/verifikasi'
+import { Route as KaryawanIndexRouteImport } from './routes/karyawan/index'
 import { Route as ManagerIndexRouteImport } from './routes/manager/index'
 import { Route as ManagerAbsensiRouteImport } from './routes/manager/absensi'
 import { Route as ManagerKaryawanRouteImport } from './routes/manager/karyawan'
@@ -33,14 +34,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AbsenRoute = AbsenRouteImport.update({
-  id: '/absen',
-  path: '/absen',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KaryawanRouteRoute = KaryawanRouteRouteImport.update({
+  id: '/karyawan',
+  path: '/karyawan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KasirRoute = KasirRouteImport.update({
@@ -93,6 +94,11 @@ const AdminVerifikasiRoute = AdminVerifikasiRouteImport.update({
   path: '/verifikasi',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const KaryawanIndexRoute = KaryawanIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => KaryawanRouteRoute,
+} as any)
 const ManagerIndexRoute = ManagerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -122,8 +128,8 @@ const TiketKodeRoute = TiketKodeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/karyawan': typeof KaryawanRouteRouteWithChildren
   '/manager': typeof ManagerRouteRouteWithChildren
-  '/absen': typeof AbsenRoute
   '/kasir': typeof KasirRoute
   '/login': typeof LoginRoute
   '/admin/jual': typeof AdminJualRoute
@@ -137,11 +143,11 @@ export interface FileRoutesByFullPath {
   '/manager/laporan': typeof ManagerLaporanRoute
   '/tiket/$kode': typeof TiketKodeRoute
   '/admin/': typeof AdminIndexRoute
+  '/karyawan/': typeof KaryawanIndexRoute
   '/manager/': typeof ManagerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/absen': typeof AbsenRoute
   '/kasir': typeof KasirRoute
   '/login': typeof LoginRoute
   '/admin/jual': typeof AdminJualRoute
@@ -155,14 +161,15 @@ export interface FileRoutesByTo {
   '/manager/laporan': typeof ManagerLaporanRoute
   '/tiket/$kode': typeof TiketKodeRoute
   '/admin': typeof AdminIndexRoute
+  '/karyawan': typeof KaryawanIndexRoute
   '/manager': typeof ManagerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/karyawan': typeof KaryawanRouteRouteWithChildren
   '/manager': typeof ManagerRouteRouteWithChildren
-  '/absen': typeof AbsenRoute
   '/kasir': typeof KasirRoute
   '/login': typeof LoginRoute
   '/admin/jual': typeof AdminJualRoute
@@ -176,6 +183,7 @@ export interface FileRoutesById {
   '/manager/laporan': typeof ManagerLaporanRoute
   '/tiket/$kode': typeof TiketKodeRoute
   '/admin/': typeof AdminIndexRoute
+  '/karyawan/': typeof KaryawanIndexRoute
   '/manager/': typeof ManagerIndexRoute
 }
 export interface FileRouteTypes {
@@ -183,8 +191,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/karyawan'
     | '/manager'
-    | '/absen'
     | '/kasir'
     | '/login'
     | '/admin/jual'
@@ -198,11 +206,11 @@ export interface FileRouteTypes {
     | '/manager/laporan'
     | '/tiket/$kode'
     | '/admin/'
+    | '/karyawan/'
     | '/manager/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/absen'
     | '/kasir'
     | '/login'
     | '/admin/jual'
@@ -216,13 +224,14 @@ export interface FileRouteTypes {
     | '/manager/laporan'
     | '/tiket/$kode'
     | '/admin'
+    | '/karyawan'
     | '/manager'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/karyawan'
     | '/manager'
-    | '/absen'
     | '/kasir'
     | '/login'
     | '/admin/jual'
@@ -236,14 +245,15 @@ export interface FileRouteTypes {
     | '/manager/laporan'
     | '/tiket/$kode'
     | '/admin/'
+    | '/karyawan/'
     | '/manager/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  KaryawanRouteRoute: typeof KaryawanRouteRouteWithChildren
   ManagerRouteRoute: typeof ManagerRouteRouteWithChildren
-  AbsenRoute: typeof AbsenRoute
   KasirRoute: typeof KasirRoute
   LoginRoute: typeof LoginRoute
   TiketKodeRoute: typeof TiketKodeRoute
@@ -258,18 +268,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/absen': {
-      id: '/absen'
-      path: '/absen'
-      fullPath: '/absen'
-      preLoaderRoute: typeof AbsenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin': {
       id: '/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/karyawan': {
+      id: '/karyawan'
+      path: '/karyawan'
+      fullPath: '/karyawan'
+      preLoaderRoute: typeof KaryawanRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kasir': {
@@ -342,6 +352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVerifikasiRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/karyawan/': {
+      id: '/karyawan/'
+      path: '/'
+      fullPath: '/karyawan/'
+      preLoaderRoute: typeof KaryawanIndexRouteImport
+      parentRoute: typeof KaryawanRouteRoute
+    }
     '/manager/': {
       id: '/manager/'
       path: '/'
@@ -404,6 +421,18 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface KaryawanRouteRouteChildren {
+  KaryawanIndexRoute: typeof KaryawanIndexRoute
+}
+
+const KaryawanRouteRouteChildren: KaryawanRouteRouteChildren = {
+  KaryawanIndexRoute: KaryawanIndexRoute,
+}
+
+const KaryawanRouteRouteWithChildren = KaryawanRouteRoute._addFileChildren(
+  KaryawanRouteRouteChildren,
+)
+
 interface ManagerRouteRouteChildren {
   ManagerAbsensiRoute: typeof ManagerAbsensiRoute
   ManagerKaryawanRoute: typeof ManagerKaryawanRoute
@@ -425,8 +454,8 @@ const ManagerRouteRouteWithChildren = ManagerRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  KaryawanRouteRoute: KaryawanRouteRouteWithChildren,
   ManagerRouteRoute: ManagerRouteRouteWithChildren,
-  AbsenRoute: AbsenRoute,
   KasirRoute: KasirRoute,
   LoginRoute: LoginRoute,
   TiketKodeRoute: TiketKodeRoute,
