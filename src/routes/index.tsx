@@ -253,10 +253,10 @@ function LandingPage() {
 
           <div className="mt-10 text-center">
             <Link
-              to="/admin/scan"
+              to="/login"
               className="text-sm font-bold text-muted-foreground underline"
             >
-              Masuk sebagai petugas/admin →
+              Masuk sebagai petugas/admin/manager →
             </Link>
           </div>
         </div>

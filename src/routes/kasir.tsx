@@ -10,6 +10,7 @@ import {
   LABEL,
   rupiah,
   tanggalJam,
+  formatNomorWa,
   type Kategori,
   type MetodeBayarTiket,
   type Tiket,
@@ -30,6 +31,8 @@ export const Route = createFileRoute("/kasir")({
 
 function KasirPage() {
   const navigate = useNavigate();
+  const [namaPembeli, setNamaPembeli] = useState("");
+  const [waNomor, setWaNomor] = useState("");
   const [kategori, setKategori] = useState<Kategori>("dewasa");
   const [jumlah, setJumlah] = useState(1);
   const [metode, setMetode] = useState<MetodeBayarTiket | null>(null);
@@ -56,8 +59,14 @@ function KasirPage() {
   const tiketTampil = statusTerbaru ?? pesanan;
 
   const buatMutation = useMutation({
-    mutationFn: (input: { kategori: Kategori; jumlah: number; metode: MetodeBayarTiket; buktiTf: string | null }) =>
-      buatTiketServer({ data: input }),
+    mutationFn: (input: {
+      kategori: Kategori;
+      jumlah: number;
+      metode: MetodeBayarTiket;
+      buktiTf: string | null;
+      namaPembeli: string;
+      waNomor: string;
+    }) => buatTiketServer({ data: input }),
     onSuccess: (tiketBaru) => {
       setPesanan(tiketBaru);
       queryClient.invalidateQueries({ queryKey: ["tiket"] });
@@ -72,7 +81,8 @@ function KasirPage() {
   }
 
   const total = HARGA[kategori] * jumlah;
-  const siapKirim = metode === "cash" || (metode === "qris" && !!buktiTf);
+  const dataDiriLengkap = namaPembeli.trim().length > 1 && waNomor.replace(/\D/g, "").length >= 8;
+  const siapKirim = dataDiriLengkap && (metode === "cash" || (metode === "qris" && !!buktiTf));
 
   // ---------- Layar status pesanan (setelah submit) ----------
   if (tiketTampil) {
@@ -104,30 +114,18 @@ function KasirPage() {
 
           <div className="mt-5 grid gap-3 print:hidden">
             <p className="text-center text-sm font-bold text-muted-foreground">
-              Takut kelupaan atau tab-nya ke-close? Kirim link tiket ini ke diri sendiri:
+              Takut kelupaan atau tab-nya ke-close? Kirim link tiket ini ke WhatsApp kamu:
             </p>
-            <div className="grid grid-cols-2 gap-3">
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(
-                  `Tiket masuk Sopo Harimoting saya: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
-              >
-                💬 Kirim ke WhatsApp
-              </a>
-              <a
-                href={`mailto:?subject=${encodeURIComponent(
-                  `Tiket Masuk Sopo Harimoting — ${tiketTampil.kode}`,
-                )}&body=${encodeURIComponent(
-                  `Tiket masuk Sopo Harimoting saya: ${tiketTampil.kode}\n\nBuka & lihat QR-nya di sini:\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
-                )}`}
-                className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
-              >
-                📧 Kirim ke Email
-              </a>
-            </div>
+            <a
+              href={`https://wa.me/${formatNomorWa(tiketTampil.waNomor)}?text=${encodeURIComponent(
+                `Halo ${tiketTampil.namaPembeli}, ini tiket masuk Sopo Harimoting kamu: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
+            >
+              💬 Kirim ke WhatsApp
+            </a>
             <button
               onClick={() => window.print()}
               className="rounded-2xl border-4 border-wood bg-card px-4 py-4 text-xl font-black text-wood-dark shadow-farm active:translate-y-0.5"
@@ -203,28 +201,27 @@ function KasirPage() {
         <p className="mt-4 text-center text-sm font-bold text-muted-foreground">
           Kalau tab ini ke-close, simpan link ini buat balik ke sini lagi:
         </p>
-        <div className="mt-2 grid grid-cols-2 gap-3">
-          <a
-            href={`https://wa.me/?text=${encodeURIComponent(
-              `Pesanan tiket Sopo Harimoting saya: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
-          >
-            💬 Kirim ke WhatsApp
-          </a>
-          <a
-            href={`mailto:?subject=${encodeURIComponent(
-              `Pesanan Tiket Sopo Harimoting — ${tiketTampil.kode}`,
-            )}&body=${encodeURIComponent(
-              `Pesanan tiket Sopo Harimoting saya: ${tiketTampil.kode}\n\nCek statusnya di sini:\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
-            )}`}
-            className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
-          >
-            📧 Kirim ke Email
-          </a>
-        </div>
+        <a
+          href={`https://wa.me/${formatNomorWa(tiketTampil.waNomor)}?text=${encodeURIComponent(
+            `Halo ${tiketTampil.namaPembeli}, pesanan tiket Sopo Harimoting kamu: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 block rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
+        >
+          💬 Kirim ke WhatsApp
+        </a>
+
+        <button
+          onClick={() => {
+            setPesanan(null);
+            setMetode(null);
+            setBuktiTf(null);
+          }}
+          className="mt-4 w-full text-center text-sm font-bold text-muted-foreground underline"
+        >
+          ← Kembali / ubah pesanan
+        </button>
       </AppShell>
     );
   }
@@ -233,6 +230,28 @@ function KasirPage() {
   return (
     <AppShell title="Beli Tiket" subtitle="Pesan tiket masuk pengunjung">
       <div className="kartu-farm p-5">
+        <p className="mb-3 text-lg font-black">Data Diri</p>
+        <label className="block text-sm font-bold text-muted-foreground">Nama Lengkap</label>
+        <input
+          value={namaPembeli}
+          onChange={(e) => setNamaPembeli(e.target.value)}
+          placeholder="Nama kamu"
+          className="mt-1 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
+        />
+        <label className="mt-3 block text-sm font-bold text-muted-foreground">Nomor WhatsApp</label>
+        <input
+          value={waNomor}
+          onChange={(e) => setWaNomor(e.target.value.replace(/[^\d+]/g, ""))}
+          inputMode="tel"
+          placeholder="08xxxxxxxxxx"
+          className="mt-1 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
+        />
+        <p className="mt-2 text-xs text-muted-foreground">
+          Dipakai buat kirim link tiket kamu ke WhatsApp & kalau petugas perlu menghubungi.
+        </p>
+      </div>
+
+      <div className="kartu-farm mt-5 p-5">
         <p className="mb-3 text-lg font-black">Kategori Tiket</p>
         <div className="grid grid-cols-2 gap-3">
           {(["dewasa", "anak"] as Kategori[]).map((k) => {
@@ -357,17 +376,21 @@ function KasirPage() {
       </div>
 
       <button
-        onClick={() => metode && buatMutation.mutate({ kategori, jumlah, metode, buktiTf })}
+        onClick={() =>
+          metode && buatMutation.mutate({ kategori, jumlah, metode, buktiTf, namaPembeli: namaPembeli.trim(), waNomor: formatNomorWa(waNomor) })
+        }
         disabled={!metode || !siapKirim || buatMutation.isPending}
         className="mt-5 w-full rounded-2xl bg-accent px-4 py-6 font-display text-2xl font-black text-accent-foreground shadow-lift transition active:translate-y-0.5 disabled:opacity-60"
       >
         {buatMutation.isPending
           ? "Mengirim..."
-          : !metode
-            ? "Pilih Metode Bayar Dulu"
-            : metode === "qris" && !buktiTf
-              ? "Upload Bukti Transfer Dulu"
-              : "Kirim Pesanan"}
+          : !dataDiriLengkap
+            ? "Isi Nama & Nomor WA Dulu"
+            : !metode
+              ? "Pilih Metode Bayar Dulu"
+              : metode === "qris" && !buktiTf
+                ? "Upload Bukti Transfer Dulu"
+                : "Kirim Pesanan"}
       </button>
 
       {buatMutation.isError ? (
@@ -399,8 +422,8 @@ function KasirPage() {
         <Link to="/" className="text-sm font-bold text-muted-foreground underline">
           ← Kembali ke beranda
         </Link>
-        <Link to="/admin/scan" className="text-sm font-bold text-muted-foreground underline">
-          Masuk sebagai petugas/admin →
+        <Link to="/login" className="text-sm font-bold text-muted-foreground underline">
+          Masuk sebagai petugas/admin/manager →
         </Link>
       </div>
     </AppShell>

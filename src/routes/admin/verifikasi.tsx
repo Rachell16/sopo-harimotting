@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MENU_ADMIN } from "@/lib/admin-menu";
-import { LABEL, rupiah, tanggalJam } from "@/lib/tickets";
+import { LABEL, rupiah, tanggalJam, formatNomorWa } from "@/lib/tickets";
 import { ambilTiketMenunggu, setujuiTiket, tolakTiket } from "@/lib/tickets.server";
 
 export const Route = createFileRoute("/admin/verifikasi")({
@@ -54,15 +54,26 @@ function VerifikasiPage() {
             <div key={p.kode} className="kartu-farm p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-display text-xl font-black">{p.kode}</p>
+                  <p className="font-display text-xl font-black">{p.namaPembeli || "(tanpa nama)"}</p>
                   <p className="text-sm font-bold text-muted-foreground">
-                    {LABEL[p.kategori]} × {p.jumlah} · {tanggalJam(p.dibuatPada)}
+                    {p.kode} · {LABEL[p.kategori]} × {p.jumlah} · {tanggalJam(p.dibuatPada)}
                   </p>
                 </div>
                 <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs font-black text-secondary-foreground">
                   {p.metode === "qris" ? "📱 QRIS" : "💵 Cash"}
                 </span>
               </div>
+
+              {p.waNomor ? (
+                <a
+                  href={`https://wa.me/${formatNomorWa(p.waNomor)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-block text-sm font-bold text-primary underline"
+                >
+                  💬 Chat {p.namaPembeli || "pembeli"} di WhatsApp
+                </a>
+              ) : null}
 
               <div className="mt-3 flex items-center justify-between rounded-xl bg-secondary px-3 py-2">
                 <span className="text-sm font-bold">Total</span>

@@ -33,6 +33,8 @@ export async function pastikanSkema() {
   await sql`ALTER TABLE tiket ADD COLUMN IF NOT EXISTS metode TEXT NOT NULL DEFAULT 'cash'`;
   await sql`ALTER TABLE tiket ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'disetujui'`;
   await sql`ALTER TABLE tiket ADD COLUMN IF NOT EXISTS bukti_tf TEXT`;
+  await sql`ALTER TABLE tiket ADD COLUMN IF NOT EXISTS nama_pembeli TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE tiket ADD COLUMN IF NOT EXISTS wa_nomor TEXT NOT NULL DEFAULT ''`;
   await sql`
     CREATE TABLE IF NOT EXISTS produk (
       kode TEXT PRIMARY KEY,

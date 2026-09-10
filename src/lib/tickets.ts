@@ -20,9 +20,20 @@ export type Tiket = {
   metode: MetodeBayarTiket;
   status: StatusTiket;
   buktiTf: string | null; // data URL base64, cuma diisi kalau metode = qris
+  namaPembeli: string;
+  waNomor: string;
   dibuatPada: string; // ISO
   dipakaiPada: string | null;
 };
+
+// Rapikan nomor WA jadi format internasional buat link wa.me
+// (08xxx -> 628xxx, +62xxx -> 62xxx, buang spasi/strip).
+export function formatNomorWa(nomor: string): string {
+  const digit = nomor.replace(/\D/g, "");
+  if (digit.startsWith("0")) return "62" + digit.slice(1);
+  if (digit.startsWith("62")) return digit;
+  return "62" + digit;
+}
 
 import { buatKode } from "./kode";
 

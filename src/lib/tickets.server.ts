@@ -18,6 +18,8 @@ type BarisTiket = {
   metode: MetodeBayarTiket;
   status: StatusTiket;
   bukti_tf: string | null;
+  nama_pembeli: string;
+  wa_nomor: string;
   dibuat_pada: string;
   dipakai_pada: string | null;
 };
@@ -31,6 +33,8 @@ function barisKeTiket(r: BarisTiket): Tiket {
     metode: r.metode,
     status: r.status,
     buktiTf: r.bukti_tf,
+    namaPembeli: r.nama_pembeli,
+    waNomor: r.wa_nomor,
     dibuatPada: new Date(r.dibuat_pada).toISOString(),
     dipakaiPada: r.dipakai_pada ? new Date(r.dipakai_pada).toISOString() : null,
   };
@@ -55,8 +59,14 @@ export const ambilSemuaTiket = createServerFn({ method: "GET" }).handler(async (
 // petugas approve (cash: konfirmasi uang diterima, qris: cek bukti transfer).
 export const buatTiketServer = createServerFn({ method: "POST" })
   .validator(
-    (data: { kategori: Kategori; jumlah: number; metode: MetodeBayarTiket; buktiTf?: string | null }) =>
-      data,
+    (data: {
+      kategori: Kategori;
+      jumlah: number;
+      metode: MetodeBayarTiket;
+      buktiTf?: string | null;
+      namaPembeli: string;
+      waNomor: string;
+    }) => data,
   )
   .handler(async ({ data }): Promise<Tiket> => {
     const total = HARGA[data.kategori] * data.jumlah;
@@ -71,6 +81,8 @@ export const buatTiketServer = createServerFn({ method: "POST" })
         metode: data.metode,
         status: "menunggu",
         buktiTf,
+        namaPembeli: data.namaPembeli,
+        waNomor: data.waNomor,
         dibuatPada: new Date().toISOString(),
         dipakaiPada: null,
       };
@@ -84,8 +96,8 @@ export const buatTiketServer = createServerFn({ method: "POST" })
       const kode = kodeAcak();
       try {
         const rows = (await sql`
-          INSERT INTO tiket (kode, kategori, jumlah, total, metode, status, bukti_tf)
-          VALUES (${kode}, ${data.kategori}, ${data.jumlah}, ${total}, ${data.metode}, 'menunggu', ${buktiTf})
+          INSERT INTO tiket (kode, kategori, jumlah, total, metode, status, bukti_tf, nama_pembeli, wa_nomor)
+          VALUES (${kode}, ${data.kategori}, ${data.jumlah}, ${total}, ${data.metode}, 'menunggu', ${buktiTf}, ${data.namaPembeli}, ${data.waNomor})
           RETURNING *
         `) as BarisTiket[];
         return barisKeTiket(rows[0]!);

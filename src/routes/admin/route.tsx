@@ -71,8 +71,8 @@ function AdminLayout() {
             <Link to="/" className="text-sm font-bold text-muted-foreground underline">
               ← Kembali ke beranda
             </Link>
-            <Link to="/manager" className="text-sm font-bold text-muted-foreground underline">
-              Masuk sebagai manager →
+            <Link to="/login" className="text-sm font-bold text-muted-foreground underline">
+              🔁 Ganti peran
             </Link>
           </div>
         </div>
