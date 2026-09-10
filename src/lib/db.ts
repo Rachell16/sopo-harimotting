@@ -77,6 +77,8 @@ export async function pastikanSkema() {
       keluar TIMESTAMPTZ
     )
   `;
+  await sql`ALTER TABLE absensi ADD COLUMN IF NOT EXISTS foto_masuk TEXT`;
+  await sql`ALTER TABLE absensi ADD COLUMN IF NOT EXISTS foto_keluar TEXT`;
   await sql`
     CREATE TABLE IF NOT EXISTS pengeluaran (
       kode TEXT PRIMARY KEY,

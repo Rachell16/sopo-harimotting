@@ -13,7 +13,9 @@ export type Absensi = {
   kode: string;
   karyawanKode: string;
   masuk: string;
+  fotoMasuk: string | null;
   keluar: string | null;
+  fotoKeluar: string | null;
 };
 
 export type Pengeluaran = {

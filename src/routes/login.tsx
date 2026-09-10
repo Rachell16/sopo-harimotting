@@ -37,6 +37,17 @@ function LoginPage() {
               <p className="text-sm text-muted-foreground">Laporan keuangan, absensi, data karyawan</p>
             </div>
           </Link>
+
+          <Link
+            to="/absen"
+            className="kartu-farm flex items-center gap-4 p-5 text-left transition hover:-translate-y-1 hover:shadow-lift"
+          >
+            <span className="text-4xl">👷</span>
+            <div>
+              <p className="font-display text-xl font-black">Petugas / Karyawan</p>
+              <p className="text-sm text-muted-foreground">Absen masuk & keluar pakai PIN + foto</p>
+            </div>
+          </Link>
         </div>
 
         <Link to="/" className="mt-6 inline-block text-sm font-bold text-muted-foreground underline">

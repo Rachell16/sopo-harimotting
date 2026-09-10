@@ -16,7 +16,9 @@ type BarisAbsensi = {
   kode: string;
   karyawan_kode: string;
   masuk: string;
+  foto_masuk: string | null;
   keluar: string | null;
+  foto_keluar: string | null;
 };
 
 function barisKeKaryawan(r: BarisKaryawan): Karyawan {
@@ -35,7 +37,9 @@ function barisKeAbsensi(r: BarisAbsensi): Absensi {
     kode: r.kode,
     karyawanKode: r.karyawan_kode,
     masuk: new Date(r.masuk).toISOString(),
+    fotoMasuk: r.foto_masuk,
     keluar: r.keluar ? new Date(r.keluar).toISOString() : null,
+    fotoKeluar: r.foto_keluar,
   };
 }
 
@@ -141,21 +145,24 @@ export const hapusKaryawan = createServerFn({ method: "POST" })
 // terbuka (belum absen keluar), sistem otomatis absen MASUK. Kalau ada,
 // otomatis absen KELUAR. Jadi 1 tombol aja, gak perlu pilih menu.
 export const absenDenganPin = createServerFn({ method: "POST" })
-  .validator((pin: string) => pin)
-  .handler(async ({ data: pin }): Promise<{ karyawan: Karyawan; aksi: "masuk" | "keluar" }> => {
+  .validator((data: { pin: string; foto: string }) => data)
+  .handler(async ({ data: { pin, foto } }): Promise<{ karyawan: Karyawan; aksi: "masuk" | "keluar" }> => {
     if (MODE_DEMO) {
       const k = karyawanDemo.find((k) => k.pin === pin && k.aktif);
       if (!k) throw new Error("PIN tidak dikenali");
       const sesiTerbuka = absensiDemo.find((a) => a.karyawanKode === k.kode && !a.keluar);
       if (sesiTerbuka) {
         sesiTerbuka.keluar = new Date().toISOString();
+        sesiTerbuka.fotoKeluar = foto;
         return { karyawan: k, aksi: "keluar" };
       }
       absensiDemo.unshift({
         kode: buatKode("ABS"),
         karyawanKode: k.kode,
         masuk: new Date().toISOString(),
+        fotoMasuk: foto,
         keluar: null,
+        fotoKeluar: null,
       });
       return { karyawan: k, aksi: "masuk" };
     }
@@ -173,12 +180,12 @@ export const absenDenganPin = createServerFn({ method: "POST" })
     `) as BarisAbsensi[];
 
     if (terbuka.length > 0) {
-      await sql`UPDATE absensi SET keluar = now() WHERE kode = ${terbuka[0]!.kode}`;
+      await sql`UPDATE absensi SET keluar = now(), foto_keluar = ${foto} WHERE kode = ${terbuka[0]!.kode}`;
       return { karyawan, aksi: "keluar" };
     }
 
     await sql`
-      INSERT INTO absensi (kode, karyawan_kode) VALUES (${buatKode("ABS")}, ${karyawan.kode})
+      INSERT INTO absensi (kode, karyawan_kode, foto_masuk) VALUES (${buatKode("ABS")}, ${karyawan.kode}, ${foto})
     `;
     return { karyawan, aksi: "masuk" };
   });

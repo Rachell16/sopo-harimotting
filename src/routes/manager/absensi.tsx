@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { MENU_MANAGER } from "@/lib/manager-menu";
 import { jam } from "@/lib/tickets";
@@ -20,6 +20,7 @@ function AbsensiPage() {
     refetchInterval: 5000,
   });
   const { data: karyawan = [] } = useQuery({ queryKey: ["karyawan"], queryFn: () => ambilKaryawan() });
+  const [lihatFoto, setLihatFoto] = useState<string | null>(null);
 
   const namaKaryawan = useMemo(() => {
     const map = new Map(karyawan.map((k) => [k.kode, k.nama]));
@@ -63,6 +64,24 @@ function AbsensiPage() {
                       <p className="text-sm font-bold text-muted-foreground">
                         Masuk {jam(a.masuk)} {a.keluar ? `· Keluar ${jam(a.keluar)}` : "· masih di lokasi"}
                       </p>
+                      <div className="mt-1 flex gap-2">
+                        {a.fotoMasuk ? (
+                          <button
+                            onClick={() => setLihatFoto(a.fotoMasuk)}
+                            className="text-xs font-bold text-primary underline"
+                          >
+                            📸 Foto masuk
+                          </button>
+                        ) : null}
+                        {a.fotoKeluar ? (
+                          <button
+                            onClick={() => setLihatFoto(a.fotoKeluar)}
+                            className="text-xs font-bold text-primary underline"
+                          >
+                            📸 Foto keluar
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
                     <p className="shrink-0 text-right text-sm font-bold text-primary">
                       {jamKerja(a.masuk, a.keluar)}
@@ -74,6 +93,20 @@ function AbsensiPage() {
           ))}
         </div>
       )}
+
+      {lihatFoto ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          onClick={() => setLihatFoto(null)}
+        >
+          <img
+            src={lihatFoto}
+            alt="Foto absen"
+            className="max-h-[85vh] max-w-full rounded-2xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      ) : null}
     </AppShell>
   );
 }
