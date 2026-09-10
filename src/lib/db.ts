@@ -77,6 +77,7 @@ export async function pastikanSkema() {
   `;
   await sql`
     CREATE TABLE IF NOT EXISTS pengeluaran (
+      kode TEXT PRIMARY KEY,
       keterangan TEXT NOT NULL,
       jumlah INTEGER NOT NULL,
       dibuat_pada TIMESTAMPTZ NOT NULL DEFAULT now()
