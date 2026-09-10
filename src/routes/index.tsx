@@ -8,13 +8,13 @@ import { HARGA, rupiah } from "@/lib/tickets";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sopo Harimoting — Wisata Keluarga" },
+      { title: "Sopo Harimotting — Wisata Keluarga" },
       {
         name: "description",
         content:
-          "Sopo Harimoting — wisata keluarga dengan area kuda, taman, gazebo piknik, dan jajanan. Beli tiket masuk langsung dari sini.",
+          "Sopo Harimotting — wisata keluarga dengan area kuda, taman, gazebo piknik, dan jajanan. Beli tiket masuk langsung dari sini.",
       },
-      { property: "og:title", content: "Sopo Harimoting — Wisata Keluarga" },
+      { property: "og:title", content: "Sopo Harimotting — Wisata Keluarga" },
       {
         property: "og:description",
         content:
@@ -90,7 +90,7 @@ function LandingPage() {
               Selamat datang di
             </p>
             <h1 className="mt-2 font-display text-6xl font-black drop-shadow-[0_4px_18px_rgba(0,0,0,0.45)] sm:text-7xl">
-              Sopo Harimoting
+              Sopo Harimotting
             </h1>
             <div className="garis-emas mx-auto mt-4 w-24" />
             <p className="mx-auto mt-4 max-w-md font-display text-lg italic opacity-95 sm:text-xl">
@@ -120,7 +120,7 @@ function LandingPage() {
             </h2>
             <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
               {/* TODO: ganti dengan deskripsi asli tempat wisata */}
-              Sopo Harimoting adalah tempat wisata keluarga dengan suasana alam
+              Sopo Harimotting adalah tempat wisata keluarga dengan suasana alam
               terbuka, area kuda, taman, dan tempat piknik yang nyaman. Cocok
               untuk liburan bersama keluarga maupun rombongan.
             </p>
