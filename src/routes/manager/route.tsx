@@ -1,15 +1,15 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { cekPinAdmin } from "@/lib/admin-auth.server";
+import { cekPinManager } from "@/lib/manager-auth.server";
 
-export const Route = createFileRoute("/admin")({
-  component: AdminLayout,
+export const Route = createFileRoute("/manager")({
+  component: ManagerLayout,
 });
 
-const KEY_SESI = "admin-masuk";
+const KEY_SESI = "manager-masuk";
 
-function AdminLayout() {
-  const [sudahMasuk, setSudahMasuk] = useState<boolean | null>(null); // null = masih cek
+function ManagerLayout() {
+  const [sudahMasuk, setSudahMasuk] = useState<boolean | null>(null);
   const [pin, setPin] = useState("");
   const [salah, setSalah] = useState(false);
   const [memeriksa, setMemeriksa] = useState(false);
@@ -22,7 +22,7 @@ function AdminLayout() {
     setMemeriksa(true);
     setSalah(false);
     try {
-      const { ok } = await cekPinAdmin({ data: pin });
+      const { ok } = await cekPinManager({ data: pin });
       if (ok) {
         sessionStorage.setItem(KEY_SESI, "1");
         setSudahMasuk(true);
@@ -34,16 +34,16 @@ function AdminLayout() {
     }
   }
 
-  if (sudahMasuk === null) return null; // hindari kedip sebelum cek sessionStorage selesai
+  if (sudahMasuk === null) return null;
 
   if (!sudahMasuk) {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <div className="kartu-farm w-full max-w-sm p-6 text-center">
-          <span className="text-5xl">🔒</span>
-          <h1 className="mt-3 font-display text-2xl font-black">Masuk Admin</h1>
+          <span className="text-5xl">🗝️</span>
+          <h1 className="mt-3 font-display text-2xl font-black">Masuk Manager</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Khusus petugas — masukkan PIN untuk lanjut ke Scan &amp; Laporan.
+            Khusus manager — masukkan PIN untuk lanjut ke Laporan, Absensi &amp; Karyawan.
           </p>
 
           <input
@@ -71,8 +71,8 @@ function AdminLayout() {
             <Link to="/" className="text-sm font-bold text-muted-foreground underline">
               ← Kembali ke beranda
             </Link>
-            <Link to="/manager" className="text-sm font-bold text-muted-foreground underline">
-              Masuk sebagai manager →
+            <Link to="/admin" className="text-sm font-bold text-muted-foreground underline">
+              Masuk sebagai petugas/admin →
             </Link>
           </div>
         </div>
@@ -82,23 +82,15 @@ function AdminLayout() {
 
   return (
     <div className="relative">
-      <div className="fixed right-3 top-3 z-40 flex gap-2">
-        <Link
-          to="/admin/pengaturan"
-          className="rounded-full bg-card/95 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-farm backdrop-blur"
-        >
-          ⚙️ Pengaturan
-        </Link>
-        <button
-          onClick={() => {
-            sessionStorage.removeItem(KEY_SESI);
-            setSudahMasuk(false);
-          }}
-          className="rounded-full bg-card/95 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-farm backdrop-blur"
-        >
-          🔒 Keluar
-        </button>
-      </div>
+      <button
+        onClick={() => {
+          sessionStorage.removeItem(KEY_SESI);
+          setSudahMasuk(false);
+        }}
+        className="fixed right-3 top-3 z-40 rounded-full bg-card/95 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-farm backdrop-blur"
+      >
+        🔒 Keluar
+      </button>
       <Outlet />
     </div>
   );

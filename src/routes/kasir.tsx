@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
@@ -29,11 +29,13 @@ export const Route = createFileRoute("/kasir")({
 });
 
 function KasirPage() {
+  const navigate = useNavigate();
   const [kategori, setKategori] = useState<Kategori>("dewasa");
   const [jumlah, setJumlah] = useState(1);
   const [metode, setMetode] = useState<MetodeBayarTiket | null>(null);
   const [buktiTf, setBuktiTf] = useState<string | null>(null);
   const [pesanan, setPesanan] = useState<Tiket | null>(null);
+  const [cariKode, setCariKode] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -101,6 +103,31 @@ function KasirPage() {
           </div>
 
           <div className="mt-5 grid gap-3 print:hidden">
+            <p className="text-center text-sm font-bold text-muted-foreground">
+              Takut kelupaan atau tab-nya ke-close? Kirim link tiket ini ke diri sendiri:
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Tiket masuk Sopo Harimoting saya: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
+              >
+                💬 Kirim ke WhatsApp
+              </a>
+              <a
+                href={`mailto:?subject=${encodeURIComponent(
+                  `Tiket Masuk Sopo Harimoting — ${tiketTampil.kode}`,
+                )}&body=${encodeURIComponent(
+                  `Tiket masuk Sopo Harimoting saya: ${tiketTampil.kode}\n\nBuka & lihat QR-nya di sini:\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
+                )}`}
+                className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
+              >
+                📧 Kirim ke Email
+              </a>
+            </div>
             <button
               onClick={() => window.print()}
               className="rounded-2xl border-4 border-wood bg-card px-4 py-4 text-xl font-black text-wood-dark shadow-farm active:translate-y-0.5"
@@ -171,6 +198,32 @@ function KasirPage() {
               ? "Silakan bayar cash ke petugas kasir. Halaman ini otomatis update begitu dikonfirmasi."
               : "Bukti transfer sudah dikirim. Halaman ini otomatis update begitu petugas verifikasi."}
           </p>
+        </div>
+
+        <p className="mt-4 text-center text-sm font-bold text-muted-foreground">
+          Kalau tab ini ke-close, simpan link ini buat balik ke sini lagi:
+        </p>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(
+              `Pesanan tiket Sopo Harimoting saya: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
+          >
+            💬 Kirim ke WhatsApp
+          </a>
+          <a
+            href={`mailto:?subject=${encodeURIComponent(
+              `Pesanan Tiket Sopo Harimoting — ${tiketTampil.kode}`,
+            )}&body=${encodeURIComponent(
+              `Pesanan tiket Sopo Harimoting saya: ${tiketTampil.kode}\n\nCek statusnya di sini:\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
+            )}`}
+            className="rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
+          >
+            📧 Kirim ke Email
+          </a>
         </div>
       </AppShell>
     );
@@ -323,7 +376,26 @@ function KasirPage() {
         </p>
       ) : null}
 
-      <div className="mt-8 flex flex-col items-center gap-2 text-center">
+      <div className="mt-8 kartu-farm p-4 text-center">
+        <p className="mb-2 text-sm font-bold text-muted-foreground">Udah pernah pesan?</p>
+        <div className="flex gap-2">
+          <input
+            value={cariKode}
+            onChange={(e) => setCariKode(e.target.value)}
+            placeholder="Masukkan kode tiket, misal WST-XXXXXX"
+            className="h-12 w-full rounded-xl border-2 border-border bg-background px-3 text-sm font-bold uppercase"
+          />
+          <button
+            onClick={() => cariKode.trim() && navigate({ to: "/tiket/$kode", params: { kode: cariKode.trim() } })}
+            disabled={!cariKode.trim()}
+            className="h-12 shrink-0 rounded-xl bg-secondary px-4 text-sm font-black text-secondary-foreground disabled:opacity-50"
+          >
+            Cek
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col items-center gap-2 text-center">
         <Link to="/" className="text-sm font-bold text-muted-foreground underline">
           ← Kembali ke beranda
         </Link>

@@ -57,5 +57,30 @@ export async function pastikanSkema() {
       value TEXT NOT NULL
     )
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS karyawan (
+      kode TEXT PRIMARY KEY,
+      nama TEXT NOT NULL,
+      pin TEXT NOT NULL UNIQUE,
+      gaji_harian INTEGER NOT NULL DEFAULT 0,
+      aktif BOOLEAN NOT NULL DEFAULT true,
+      dibuat_pada TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS absensi (
+      kode TEXT PRIMARY KEY,
+      karyawan_kode TEXT NOT NULL REFERENCES karyawan(kode) ON DELETE CASCADE,
+      masuk TIMESTAMPTZ NOT NULL DEFAULT now(),
+      keluar TIMESTAMPTZ
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS pengeluaran (
+      keterangan TEXT NOT NULL,
+      jumlah INTEGER NOT NULL,
+      dibuat_pada TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
   sudahSiap = true;
 }

@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AbsenRouteImport } from './routes/absen'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as KasirRouteImport } from './routes/kasir'
+import { Route as ManagerRouteRouteImport } from './routes/manager/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminJualRouteImport } from './routes/admin/jual'
 import { Route as AdminLaporanRouteImport } from './routes/admin/laporan'
@@ -19,10 +21,20 @@ import { Route as AdminPengaturanRouteImport } from './routes/admin/pengaturan'
 import { Route as AdminScanRouteImport } from './routes/admin/scan'
 import { Route as AdminStokRouteImport } from './routes/admin/stok'
 import { Route as AdminVerifikasiRouteImport } from './routes/admin/verifikasi'
+import { Route as ManagerIndexRouteImport } from './routes/manager/index'
+import { Route as ManagerAbsensiRouteImport } from './routes/manager/absensi'
+import { Route as ManagerKaryawanRouteImport } from './routes/manager/karyawan'
+import { Route as ManagerLaporanRouteImport } from './routes/manager/laporan'
+import { Route as TiketKodeRouteImport } from './routes/tiket/$kode'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AbsenRoute = AbsenRouteImport.update({
+  id: '/absen',
+  path: '/absen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -33,6 +45,11 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
 const KasirRoute = KasirRouteImport.update({
   id: '/kasir',
   path: '/kasir',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManagerRouteRoute = ManagerRouteRouteImport.update({
+  id: '/manager',
+  path: '/manager',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -70,10 +87,37 @@ const AdminVerifikasiRoute = AdminVerifikasiRouteImport.update({
   path: '/verifikasi',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const ManagerIndexRoute = ManagerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerAbsensiRoute = ManagerAbsensiRouteImport.update({
+  id: '/absensi',
+  path: '/absensi',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerKaryawanRoute = ManagerKaryawanRouteImport.update({
+  id: '/karyawan',
+  path: '/karyawan',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerLaporanRoute = ManagerLaporanRouteImport.update({
+  id: '/laporan',
+  path: '/laporan',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const TiketKodeRoute = TiketKodeRouteImport.update({
+  id: '/tiket/$kode',
+  path: '/tiket/$kode',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/manager': typeof ManagerRouteRouteWithChildren
+  '/absen': typeof AbsenRoute
   '/kasir': typeof KasirRoute
   '/admin/jual': typeof AdminJualRoute
   '/admin/laporan': typeof AdminLaporanRoute
@@ -81,10 +125,16 @@ export interface FileRoutesByFullPath {
   '/admin/scan': typeof AdminScanRoute
   '/admin/stok': typeof AdminStokRoute
   '/admin/verifikasi': typeof AdminVerifikasiRoute
+  '/manager/absensi': typeof ManagerAbsensiRoute
+  '/manager/karyawan': typeof ManagerKaryawanRoute
+  '/manager/laporan': typeof ManagerLaporanRoute
+  '/tiket/$kode': typeof TiketKodeRoute
   '/admin/': typeof AdminIndexRoute
+  '/manager/': typeof ManagerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/absen': typeof AbsenRoute
   '/kasir': typeof KasirRoute
   '/admin/jual': typeof AdminJualRoute
   '/admin/laporan': typeof AdminLaporanRoute
@@ -92,12 +142,19 @@ export interface FileRoutesByTo {
   '/admin/scan': typeof AdminScanRoute
   '/admin/stok': typeof AdminStokRoute
   '/admin/verifikasi': typeof AdminVerifikasiRoute
+  '/manager/absensi': typeof ManagerAbsensiRoute
+  '/manager/karyawan': typeof ManagerKaryawanRoute
+  '/manager/laporan': typeof ManagerLaporanRoute
+  '/tiket/$kode': typeof TiketKodeRoute
   '/admin': typeof AdminIndexRoute
+  '/manager': typeof ManagerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/manager': typeof ManagerRouteRouteWithChildren
+  '/absen': typeof AbsenRoute
   '/kasir': typeof KasirRoute
   '/admin/jual': typeof AdminJualRoute
   '/admin/laporan': typeof AdminLaporanRoute
@@ -105,13 +162,20 @@ export interface FileRoutesById {
   '/admin/scan': typeof AdminScanRoute
   '/admin/stok': typeof AdminStokRoute
   '/admin/verifikasi': typeof AdminVerifikasiRoute
+  '/manager/absensi': typeof ManagerAbsensiRoute
+  '/manager/karyawan': typeof ManagerKaryawanRoute
+  '/manager/laporan': typeof ManagerLaporanRoute
+  '/tiket/$kode': typeof TiketKodeRoute
   '/admin/': typeof AdminIndexRoute
+  '/manager/': typeof ManagerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
+    | '/manager'
+    | '/absen'
     | '/kasir'
     | '/admin/jual'
     | '/admin/laporan'
@@ -119,10 +183,16 @@ export interface FileRouteTypes {
     | '/admin/scan'
     | '/admin/stok'
     | '/admin/verifikasi'
+    | '/manager/absensi'
+    | '/manager/karyawan'
+    | '/manager/laporan'
+    | '/tiket/$kode'
     | '/admin/'
+    | '/manager/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/absen'
     | '/kasir'
     | '/admin/jual'
     | '/admin/laporan'
@@ -130,11 +200,18 @@ export interface FileRouteTypes {
     | '/admin/scan'
     | '/admin/stok'
     | '/admin/verifikasi'
+    | '/manager/absensi'
+    | '/manager/karyawan'
+    | '/manager/laporan'
+    | '/tiket/$kode'
     | '/admin'
+    | '/manager'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/manager'
+    | '/absen'
     | '/kasir'
     | '/admin/jual'
     | '/admin/laporan'
@@ -142,13 +219,21 @@ export interface FileRouteTypes {
     | '/admin/scan'
     | '/admin/stok'
     | '/admin/verifikasi'
+    | '/manager/absensi'
+    | '/manager/karyawan'
+    | '/manager/laporan'
+    | '/tiket/$kode'
     | '/admin/'
+    | '/manager/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  ManagerRouteRoute: typeof ManagerRouteRouteWithChildren
+  AbsenRoute: typeof AbsenRoute
   KasirRoute: typeof KasirRoute
+  TiketKodeRoute: typeof TiketKodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -158,6 +243,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/absen': {
+      id: '/absen'
+      path: '/absen'
+      fullPath: '/absen'
+      preLoaderRoute: typeof AbsenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -172,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/kasir'
       fullPath: '/kasir'
       preLoaderRoute: typeof KasirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manager': {
+      id: '/manager'
+      path: '/manager'
+      fullPath: '/manager'
+      preLoaderRoute: typeof ManagerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -223,6 +322,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVerifikasiRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/manager/': {
+      id: '/manager/'
+      path: '/'
+      fullPath: '/manager/'
+      preLoaderRoute: typeof ManagerIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/absensi': {
+      id: '/manager/absensi'
+      path: '/absensi'
+      fullPath: '/manager/absensi'
+      preLoaderRoute: typeof ManagerAbsensiRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/karyawan': {
+      id: '/manager/karyawan'
+      path: '/karyawan'
+      fullPath: '/manager/karyawan'
+      preLoaderRoute: typeof ManagerKaryawanRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/laporan': {
+      id: '/manager/laporan'
+      path: '/laporan'
+      fullPath: '/manager/laporan'
+      preLoaderRoute: typeof ManagerLaporanRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/tiket/$kode': {
+      id: '/tiket/$kode'
+      path: '/tiket/$kode'
+      fullPath: '/tiket/$kode'
+      preLoaderRoute: typeof TiketKodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -250,10 +384,31 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface ManagerRouteRouteChildren {
+  ManagerAbsensiRoute: typeof ManagerAbsensiRoute
+  ManagerKaryawanRoute: typeof ManagerKaryawanRoute
+  ManagerLaporanRoute: typeof ManagerLaporanRoute
+  ManagerIndexRoute: typeof ManagerIndexRoute
+}
+
+const ManagerRouteRouteChildren: ManagerRouteRouteChildren = {
+  ManagerAbsensiRoute: ManagerAbsensiRoute,
+  ManagerKaryawanRoute: ManagerKaryawanRoute,
+  ManagerLaporanRoute: ManagerLaporanRoute,
+  ManagerIndexRoute: ManagerIndexRoute,
+}
+
+const ManagerRouteRouteWithChildren = ManagerRouteRoute._addFileChildren(
+  ManagerRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  ManagerRouteRoute: ManagerRouteRouteWithChildren,
+  AbsenRoute: AbsenRoute,
   KasirRoute: KasirRoute,
+  TiketKodeRoute: TiketKodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
