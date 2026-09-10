@@ -6,6 +6,7 @@ import type { Absensi, Karyawan } from "./karyawan";
 type BarisKaryawan = {
   kode: string;
   nama: string;
+  username: string;
   pin: string;
   gaji_harian: number;
   aktif: boolean;
@@ -25,6 +26,7 @@ function barisKeKaryawan(r: BarisKaryawan): Karyawan {
   return {
     kode: r.kode,
     nama: r.nama,
+    username: r.username,
     pin: r.pin,
     gajiHarian: r.gaji_harian,
     aktif: r.aktif,
@@ -58,13 +60,16 @@ export const ambilKaryawan = createServerFn({ method: "GET" }).handler(async ():
 });
 
 export const buatKaryawan = createServerFn({ method: "POST" })
-  .validator((data: { nama: string; pin: string; gajiHarian: number }) => data)
+  .validator((data: { nama: string; username: string; pin: string; gajiHarian: number }) => data)
   .handler(async ({ data }): Promise<Karyawan> => {
+    const username = data.username.trim().toLowerCase();
+
     if (MODE_DEMO) {
-      if (karyawanDemo.some((k) => k.pin === data.pin)) throw new Error("PIN sudah dipakai karyawan lain");
+      if (karyawanDemo.some((k) => k.username === username)) throw new Error("Username sudah dipakai karyawan lain");
       const k: Karyawan = {
         kode: buatKode("KRY"),
         nama: data.nama,
+        username,
         pin: data.pin,
         gajiHarian: data.gajiHarian,
         aktif: true,
@@ -79,14 +84,14 @@ export const buatKaryawan = createServerFn({ method: "POST" })
       const kode = buatKode("KRY");
       try {
         const rows = (await sql`
-          INSERT INTO karyawan (kode, nama, pin, gaji_harian)
-          VALUES (${kode}, ${data.nama}, ${data.pin}, ${data.gajiHarian})
+          INSERT INTO karyawan (kode, nama, username, pin, gaji_harian)
+          VALUES (${kode}, ${data.nama}, ${username}, ${data.pin}, ${data.gajiHarian})
           RETURNING *
         `) as BarisKaryawan[];
         return barisKeKaryawan(rows[0]!);
       } catch (err: any) {
         if (err?.code === "23505" && err?.constraint?.includes("pkey")) continue; // kode bentrok, coba lagi
-        if (err?.code === "23505") throw new Error("PIN sudah dipakai karyawan lain");
+        if (err?.code === "23505") throw new Error("Username sudah dipakai karyawan lain");
         throw err;
       }
     }
@@ -94,14 +99,23 @@ export const buatKaryawan = createServerFn({ method: "POST" })
   });
 
 export const updateKaryawan = createServerFn({ method: "POST" })
-  .validator((data: { kode: string; nama: string; pin: string; gajiHarian: number; aktif: boolean }) => data)
+  .validator(
+    (data: { kode: string; nama: string; username: string; pin: string; gajiHarian: number; aktif: boolean }) =>
+      data,
+  )
   .handler(async ({ data }): Promise<Karyawan> => {
+    const username = data.username.trim().toLowerCase();
+
     if (MODE_DEMO) {
       const idx = karyawanDemo.findIndex((k) => k.kode === data.kode);
       if (idx === -1) throw new Error("Karyawan tidak ditemukan");
+      if (karyawanDemo.some((k) => k.username === username && k.kode !== data.kode)) {
+        throw new Error("Username sudah dipakai karyawan lain");
+      }
       karyawanDemo[idx] = {
         ...karyawanDemo[idx]!,
         nama: data.nama,
+        username,
         pin: data.pin,
         gajiHarian: data.gajiHarian,
         aktif: data.aktif,
@@ -113,14 +127,14 @@ export const updateKaryawan = createServerFn({ method: "POST" })
     try {
       const rows = (await sql`
         UPDATE karyawan
-        SET nama = ${data.nama}, pin = ${data.pin}, gaji_harian = ${data.gajiHarian}, aktif = ${data.aktif}
+        SET nama = ${data.nama}, username = ${username}, pin = ${data.pin}, gaji_harian = ${data.gajiHarian}, aktif = ${data.aktif}
         WHERE kode = ${data.kode}
         RETURNING *
       `) as BarisKaryawan[];
       if (rows.length === 0) throw new Error("Karyawan tidak ditemukan");
       return barisKeKaryawan(rows[0]!);
     } catch (err: any) {
-      if (err?.code === "23505") throw new Error("PIN sudah dipakai karyawan lain");
+      if (err?.code === "23505") throw new Error("Username sudah dipakai karyawan lain");
       throw err;
     }
   });
@@ -144,19 +158,21 @@ export const hapusKaryawan = createServerFn({ method: "POST" })
 // Langkah 1: karyawan login pakai PIN. Kalau cocok, kembalikan datanya (buat
 // disimpan di sessionStorage sebagai sesi) — belum melakukan absen apa pun.
 export const loginKaryawan = createServerFn({ method: "POST" })
-  .validator((pin: string) => pin)
-  .handler(async ({ data: pin }): Promise<Karyawan> => {
+  .validator((data: { username: string; pin: string }) => data)
+  .handler(async ({ data }): Promise<Karyawan> => {
+    const username = data.username.trim().toLowerCase();
+
     if (MODE_DEMO) {
-      const k = karyawanDemo.find((k) => k.pin === pin && k.aktif);
-      if (!k) throw new Error("PIN tidak dikenali");
+      const k = karyawanDemo.find((k) => k.username === username && k.pin === data.pin && k.aktif);
+      if (!k) throw new Error("Username atau PIN salah");
       return k;
     }
 
     await pastikanSkema();
     const rows = (await sql`
-      SELECT * FROM karyawan WHERE pin = ${pin} AND aktif = true
+      SELECT * FROM karyawan WHERE username = ${username} AND pin = ${data.pin} AND aktif = true
     `) as BarisKaryawan[];
-    if (rows.length === 0) throw new Error("PIN tidak dikenali");
+    if (rows.length === 0) throw new Error("Username atau PIN salah");
     return barisKeKaryawan(rows[0]!);
   });
 

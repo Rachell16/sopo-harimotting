@@ -69,6 +69,7 @@ export async function pastikanSkema() {
       dibuat_pada TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
+  await sql`ALTER TABLE karyawan ADD COLUMN IF NOT EXISTS username TEXT UNIQUE`;
   await sql`
     CREATE TABLE IF NOT EXISTS absensi (
       kode TEXT PRIMARY KEY,

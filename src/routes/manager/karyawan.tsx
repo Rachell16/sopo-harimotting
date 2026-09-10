@@ -12,7 +12,7 @@ export const Route = createFileRoute("/manager/karyawan")({
   component: KaryawanPage,
 });
 
-type Form = { kode: string | null; nama: string; pin: string; gajiHarian: string; aktif: boolean };
+type Form = { kode: string | null; nama: string; username: string; pin: string; gajiHarian: string; aktif: boolean };
 
 function KaryawanPage() {
   const queryClient = useQueryClient();
@@ -25,6 +25,7 @@ function KaryawanPage() {
       if (!form) return;
       const data = {
         nama: form.nama.trim(),
+        username: form.username.trim(),
         pin: form.pin.trim(),
         gajiHarian: Number(form.gajiHarian) || 0,
       };
@@ -53,7 +54,7 @@ function KaryawanPage() {
     >
       <button
         onClick={() => {
-          setForm({ kode: null, nama: "", pin: "", gajiHarian: "", aktif: true });
+          setForm({ kode: null, nama: "", username: "", pin: "", gajiHarian: "", aktif: true });
           setPesanError(null);
         }}
         className="mb-5 w-full rounded-2xl bg-accent px-4 py-4 text-center font-display text-xl font-black text-accent-foreground shadow-lift"
@@ -74,7 +75,7 @@ function KaryawanPage() {
                   {k.nama} {!k.aktif ? <span className="text-sm text-muted-foreground">(nonaktif)</span> : null}
                 </p>
                 <p className="text-sm font-bold text-muted-foreground">
-                  PIN: {k.pin} · Gaji harian: {rupiah(k.gajiHarian)}
+                  @{k.username} · PIN: {k.pin} · Gaji harian: {rupiah(k.gajiHarian)}
                 </p>
               </div>
               <button
@@ -82,6 +83,7 @@ function KaryawanPage() {
                   setForm({
                     kode: k.kode,
                     nama: k.nama,
+                    username: k.username,
                     pin: k.pin,
                     gajiHarian: String(k.gajiHarian),
                     aktif: k.aktif,
@@ -126,7 +128,15 @@ function KaryawanPage() {
               autoFocus
             />
 
-            <label className="mt-4 block text-sm font-bold text-muted-foreground">PIN (buat absen)</label>
+            <label className="mt-4 block text-sm font-bold text-muted-foreground">Username (buat login)</label>
+            <input
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value.replace(/\s/g, "").toLowerCase() })}
+              placeholder="budi"
+              className="mt-1 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
+            />
+
+            <label className="mt-4 block text-sm font-bold text-muted-foreground">PIN (buat login)</label>
             <input
               value={form.pin}
               onChange={(e) => setForm({ ...form, pin: e.target.value.replace(/\D/g, "") })}
@@ -167,7 +177,7 @@ function KaryawanPage() {
               </button>
               <button
                 onClick={() => simpanMutation.mutate()}
-                disabled={!form.nama.trim() || !form.pin.trim() || simpanMutation.isPending}
+                disabled={!form.nama.trim() || !form.username.trim() || !form.pin.trim() || simpanMutation.isPending}
                 className="flex-1 rounded-xl bg-accent px-4 py-4 font-black text-accent-foreground disabled:opacity-60"
               >
                 {simpanMutation.isPending ? "..." : "Simpan"}

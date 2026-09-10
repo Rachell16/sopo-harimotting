@@ -10,6 +10,7 @@ const KEY_SESI = "karyawan-sesi"; // JSON { kode, nama }
 
 function KaryawanLayout() {
   const [sesi, setSesi] = useState<{ kode: string; nama: string } | null | undefined>(undefined);
+  const [username, setUsername] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [memeriksa, setMemeriksa] = useState(false);
@@ -23,12 +24,12 @@ function KaryawanLayout() {
     setMemeriksa(true);
     setError(null);
     try {
-      const k = await loginKaryawan({ data: pin });
+      const k = await loginKaryawan({ data: { username, pin } });
       const info = { kode: k.kode, nama: k.nama };
       sessionStorage.setItem(KEY_SESI, JSON.stringify(info));
       setSesi(info);
     } catch (err: any) {
-      setError(err?.message || "PIN tidak dikenali.");
+      setError(err?.message || "Username atau PIN salah.");
     } finally {
       setMemeriksa(false);
     }
@@ -43,9 +44,16 @@ function KaryawanLayout() {
           <span className="text-5xl">👷</span>
           <h1 className="mt-3 font-display text-2xl font-black">Login Karyawan</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Masukkan PIN kamu buat masuk ke dashboard absensi pribadi.
+            Masukkan username & PIN kamu buat masuk ke dashboard absensi pribadi.
           </p>
 
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            className="mt-5 h-14 w-full rounded-xl border-4 border-border bg-background px-4 text-center text-lg font-bold"
+            autoFocus
+          />
           <input
             type="password"
             inputMode="numeric"
@@ -53,15 +61,14 @@ function KaryawanLayout() {
             onChange={(e) => setPin(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && submit()}
             placeholder="PIN"
-            className="mt-5 h-14 w-full rounded-xl border-4 border-border bg-background text-center font-display text-2xl font-black tracking-widest"
-            autoFocus
+            className="mt-3 h-14 w-full rounded-xl border-4 border-border bg-background text-center font-display text-2xl font-black tracking-widest"
           />
 
           {error ? <p className="mt-2 text-sm font-bold text-destructive">{error}</p> : null}
 
           <button
             onClick={submit}
-            disabled={memeriksa || !pin}
+            disabled={memeriksa || !username || !pin}
             className="mt-5 w-full rounded-2xl bg-accent px-4 py-4 font-display text-xl font-black text-accent-foreground shadow-lift disabled:opacity-60"
           >
             {memeriksa ? "Memeriksa..." : "Masuk"}

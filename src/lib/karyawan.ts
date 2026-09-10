@@ -3,6 +3,7 @@ import { kelompokkanPerTanggal } from "./tanggal";
 export type Karyawan = {
   kode: string;
   nama: string;
+  username: string;
   pin: string;
   gajiHarian: number;
   aktif: boolean;
