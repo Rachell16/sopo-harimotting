@@ -95,7 +95,7 @@ export function MomentCarousel({ slide }: { slide: SlideMomen[] }) {
             key={m.judul}
             data-kartu
             onClick={() => setPopup(i)}
-            className="w-[68%] shrink-0 snap-start text-left sm:w-[42%] lg:w-[30%]"
+            className="w-[68%] shrink-0 snap-start text-left sm:w-[38%] lg:w-[26%] xl:w-[22%]"
             aria-label={`Lihat lebih besar: ${m.judul}`}
           >
             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border-4 border-wood shadow-lift">

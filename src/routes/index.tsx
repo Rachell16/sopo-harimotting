@@ -119,7 +119,7 @@ function LandingPage() {
           </div>
         </div>
 
-        <div className="mx-auto max-w-3xl px-4">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           {/* CTA BELI TIKET */}
           <div className="hero-muncul relative z-10 -mt-7 mb-14">
             <Link
@@ -182,7 +182,7 @@ function LandingPage() {
             <h2 className="mb-6 font-display text-4xl font-black">
               Harga Tiket Masuk
             </h2>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid max-w-md grid-cols-2 gap-6">
               <div className="kartu-tiket p-5 text-center transition hover:-translate-y-1">
                 <span className="text-3xl">🧑‍🌾</span>
                 <p className="mt-1 font-display text-lg font-black">Dewasa</p>
@@ -203,7 +203,7 @@ function LandingPage() {
           {/* ALAMAT & LOKASI — panel gelap senada hero, kontras premium */}
           <Reveal id="lokasi" className="mb-4 scroll-mt-24">
             <h2 className="mb-6 font-display text-4xl font-black">Lokasi</h2>
-            <div className="panel-kayu rounded-2xl p-6 shadow-lift sm:p-8">
+            <div className="panel-kayu max-w-2xl rounded-2xl p-6 shadow-lift sm:p-8">
               <p className="font-bold opacity-90">📍 Alamat</p>
               <p className="mt-1 opacity-80">
                 Desa Paniaran, Kecamatan Siborongborong, Kabupaten Tapanuli
@@ -232,7 +232,7 @@ function LandingPage() {
             <h2 className="mb-6 font-display text-4xl font-black">
               Hubungi & Ikuti Kami
             </h2>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid max-w-md grid-cols-3 gap-3">
               <a
                 href="https://wa.me/6282213079439"
                 target="_blank"
