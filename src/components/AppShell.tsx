@@ -20,7 +20,7 @@ export function AppShell({
 }) {
   return (
     <div className={menu && menu.length > 0 ? "min-h-screen pb-28" : "min-h-screen pb-8"}>
-      <header className="panel-kayu px-4 py-5 shadow-lift">
+      <header className="panel-kayu px-4 py-5 shadow-lift print:hidden">
         <div className="mx-auto grid max-w-3xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <div className="min-w-0">
             <p className="text-xs font-bold tracking-[0.2em] uppercase opacity-80">{label}</p>
@@ -34,7 +34,7 @@ export function AppShell({
       <main className="mx-auto max-w-3xl px-4 py-6">{children}</main>
 
       {menu && menu.length > 0 ? (
-        <nav className="fixed inset-x-0 bottom-0 z-30 border-t-4 border-wood bg-card/95 backdrop-blur">
+        <nav className="fixed inset-x-0 bottom-0 z-30 border-t-4 border-wood bg-card/95 backdrop-blur print:hidden">
           <div
             className="mx-auto grid max-w-3xl"
             style={{ gridTemplateColumns: `repeat(${menu.length}, minmax(0, 1fr))` }}

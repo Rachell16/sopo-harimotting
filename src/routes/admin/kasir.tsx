@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { AppShell } from "@/components/AppShell";
 import { MENU_ADMIN } from "@/lib/admin-menu";
 import { buatTiketAdmin } from "@/lib/tickets.server";
+import { ambilQris } from "@/lib/pengaturan.server";
 import { HARGA, LABEL, rupiah, tanggalJam, type Kategori, type MetodeBayarTiket, type Tiket } from "@/lib/tickets";
 
 export const Route = createFileRoute("/admin/kasir")({
@@ -21,12 +22,16 @@ function KasirAdminPage() {
   const [namaPembeli, setNamaPembeli] = useState("");
   const [waNomor, setWaNomor] = useState("");
   const [tiket, setTiket] = useState<Tiket | null>(null);
+  const [modalQris, setModalQris] = useState(false);
+
+  const { data: qris } = useQuery({ queryKey: ["qris"], queryFn: () => ambilQris(), enabled: modalQris });
 
   const buatMutation = useMutation({
     mutationFn: (data: { kategori: Kategori; jumlah: number; metode: MetodeBayarTiket; namaPembeli: string; waNomor: string }) =>
       buatTiketAdmin({ data }),
     onSuccess: (t) => {
       setTiket(t);
+      setModalQris(false);
       queryClient.invalidateQueries({ queryKey: ["tiket"] });
     },
   });
@@ -176,11 +181,11 @@ function KasirAdminPage() {
           {buatMutation.isPending ? "..." : "💵 Bayar Cash"}
         </button>
         <button
-          onClick={() => buatMutation.mutate({ kategori, jumlah, metode: "qris", namaPembeli, waNomor })}
+          onClick={() => setModalQris(true)}
           disabled={buatMutation.isPending}
           className="rounded-2xl bg-accent px-4 py-5 text-center font-display text-xl font-black text-accent-foreground shadow-lift disabled:opacity-60"
         >
-          {buatMutation.isPending ? "..." : "📱 Bayar QRIS"}
+          📱 Bayar QRIS
         </button>
       </div>
 
@@ -189,7 +194,8 @@ function KasirAdminPage() {
       ) : null}
 
       <p className="mt-4 text-center text-xs text-muted-foreground">
-        Kedua tombol langsung bikin & aktifin tiket — pilih sesuai apa yang pengunjung bayar ke kamu.
+        Cash langsung bikin tiket. QRIS nunjukin kode dulu, tiket baru dibuat setelah kamu konfirmasi
+        pengunjung udah bayar.
       </p>
 
       <div className="mt-6 text-center">
@@ -197,6 +203,59 @@ function KasirAdminPage() {
           Lihat pesanan online yang menunggu →
         </Link>
       </div>
+
+      {/* Pop-up QRIS */}
+      {modalQris ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          onClick={() => !buatMutation.isPending && setModalQris(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-3xl bg-card p-6 text-center shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-display text-xl font-black">Scan QRIS untuk Bayar</p>
+            <p className="mt-1 font-display text-2xl font-black text-primary">{rupiah(total)}</p>
+
+            {qris ? (
+              <img
+                src={qris}
+                alt="Kode QRIS"
+                className="mx-auto mt-4 h-56 w-56 rounded-2xl border-4 border-wood bg-white object-contain p-2"
+              />
+            ) : (
+              <div className="mt-4">
+                <p className="text-sm font-bold text-muted-foreground">
+                  QRIS belum di-upload. Upload dulu di halaman Pengaturan.
+                </p>
+                <Link
+                  to="/admin/pengaturan"
+                  className="mt-3 inline-block rounded-xl bg-secondary px-4 py-2 text-sm font-black text-secondary-foreground"
+                >
+                  ⚙️ Ke Pengaturan
+                </Link>
+              </div>
+            )}
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setModalQris(false)}
+                disabled={buatMutation.isPending}
+                className="flex-1 rounded-xl bg-secondary px-4 py-4 font-black text-secondary-foreground disabled:opacity-60"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => buatMutation.mutate({ kategori, jumlah, metode: "qris", namaPembeli, waNomor })}
+                disabled={buatMutation.isPending || !qris}
+                className="flex-1 rounded-xl bg-accent px-4 py-4 font-black text-accent-foreground disabled:opacity-60"
+              >
+                {buatMutation.isPending ? "..." : "✅ Sudah Dibayar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </AppShell>
   );
 }

@@ -87,7 +87,7 @@ function ManagerLayout() {
           sessionStorage.removeItem(KEY_SESI);
           setSudahMasuk(false);
         }}
-        className="fixed right-3 top-3 z-40 rounded-full bg-card/95 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-farm backdrop-blur"
+        className="fixed right-3 top-3 z-40 rounded-full bg-card/95 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-farm backdrop-blur print:hidden"
       >
         🔒 Keluar
       </button>

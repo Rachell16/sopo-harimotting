@@ -82,7 +82,7 @@ function AdminLayout() {
 
   return (
     <div className="relative">
-      <div className="fixed right-3 top-3 z-40 flex gap-2">
+      <div className="fixed right-3 top-3 z-40 flex gap-2 print:hidden">
         <Link
           to="/admin/pengaturan"
           className="rounded-full bg-card/95 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-farm backdrop-blur"
