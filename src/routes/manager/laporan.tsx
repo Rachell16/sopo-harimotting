@@ -15,7 +15,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { MENU_MANAGER } from "@/lib/manager-menu";
 import { useTiketList } from "@/hooks/useTiket";
-import { kelompokPerTanggal, rupiah, LABEL } from "@/lib/tickets";
+import { jam, kelompokPerTanggal, rupiah, LABEL } from "@/lib/tickets";
 import { ambilPenjualan, ambilProduk } from "@/lib/warung.server";
 import { kelompokPenjualanPerTanggal } from "@/lib/warung";
 import { ambilAbsensi, ambilKaryawan } from "@/lib/karyawan.server";
@@ -33,6 +33,11 @@ const FILTER = [
   { id: "7", label: "7 Hari" },
   { id: "30", label: "30 Hari" },
   { id: "semua", label: "Semua" },
+] as const;
+
+const TAB = [
+  { id: "tiket", label: "🎟️ Tiket" },
+  { id: "jajanan", label: "🛍️ Jajanan" },
 ] as const;
 
 function labelTgl(kunci: string) {
@@ -101,6 +106,7 @@ function LaporanManagerPage() {
   // (itu tetap angka utuh seluruh bisnis), cuma nyaring 2 section analitik ini aja.
   const [filterKategoriTiket, setFilterKategoriTiket] = useState<"semua" | "dewasa" | "anak">("semua");
   const [filterKategoriJajanan, setFilterKategoriJajanan] = useState<string>("semua");
+  const [tab, setTab] = useState<(typeof TAB)[number]["id"]>("tiket");
 
   const tiketUntukKunjungan = useMemo(
     () => (filterKategoriTiket === "semua" ? tiket : tiket.filter((t) => t.kategori === filterKategoriTiket)),
@@ -115,6 +121,23 @@ function LaporanManagerPage() {
       .map((p) => ({ ...p, item: p.item.filter((i) => produkKategoriMap.get(i.kode) === filterKategoriJajanan) }))
       .filter((p) => p.item.length > 0);
   }, [jajanan, filterKategoriJajanan, produkKategoriMap]);
+
+  // Sama kayak jajananUntukTerlaris, tapi total-nya diitung ulang dari item yang
+  // ke-filter aja (bukan total transaksi utuh) — biar angka yang ditampilkan di
+  // riwayat harian konsisten sama item yang keliatan.
+  const jajananUntukRiwayat = useMemo(() => {
+    if (filterKategoriJajanan === "semua") return jajanan;
+    return jajananUntukTerlaris.map((p) => ({
+      ...p,
+      total: p.item.reduce((a, i) => a + i.harga * i.qty, 0),
+    }));
+  }, [jajanan, jajananUntukTerlaris, filterKategoriJajanan]);
+
+  const kelompokTiketRiwayat = useMemo(() => kelompokPerTanggal(tiketUntukKunjungan), [tiketUntukKunjungan]);
+  const kelompokJajananRiwayat = useMemo(
+    () => kelompokPenjualanPerTanggal(jajananUntukRiwayat),
+    [jajananUntukRiwayat],
+  );
 
   // Analitik: pola kunjungan, produk terlaris, breakdown tiket, stok menipis.
   const kunjunganHari = useMemo(() => kunjunganPerHariMinggu(tiketUntukKunjungan), [tiketUntukKunjungan]);
@@ -338,26 +361,9 @@ function LaporanManagerPage() {
         )}
       </div>
 
-      {/* Kunjungan per hari — buat lihat hari mana paling ramai */}
+      {/* Kunjungan per hari — buat lihat hari mana paling ramai (ngikut filter kategori tiket di atas) */}
       <div className="kartu-farm mt-6 p-4">
-        <div className="flex items-center justify-between">
-          <p className="font-display text-xl font-black">Kunjungan per Hari</p>
-          <div className="flex gap-1.5">
-            {(["semua", "dewasa", "anak"] as const).map((k) => (
-              <button
-                key={k}
-                onClick={() => setFilterKategoriTiket(k)}
-                className={`rounded-full px-3 py-1 text-xs font-black transition ${
-                  filterKategoriTiket === k
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {k === "semua" ? "Semua" : LABEL[k]}
-              </button>
-            ))}
-          </div>
-        </div>
+        <p className="font-display text-xl font-black">Kunjungan per Hari</p>
         {hariRamai && hariRamai.jumlah > 0 ? (
           <p className="mt-1 text-sm text-muted-foreground">
             Paling ramai: <span className="font-black text-foreground">{hariRamai.hari}</span> ({hariRamai.jumlah}{" "}
@@ -379,40 +385,157 @@ function LaporanManagerPage() {
         </div>
       </div>
 
-      {/* Breakdown tiket per kategori */}
+      {/* Riwayat transaksi — gaya admin, tapi ada filter kategori */}
       <div className="mt-6">
-        <p className="mb-3 font-display text-xl font-black">Breakdown Tiket</p>
-        <div className="grid grid-cols-2 gap-3">
-          {breakdownTiket.map((b) => (
-            <div key={b.kategori} className="kartu-farm p-4 text-center">
-              <span className="text-3xl">{b.kategori === "dewasa" ? "🧑‍🌾" : "🧒"}</span>
-              <p className="mt-1 font-display text-lg font-black">{LABEL[b.kategori]}</p>
-              <p className="text-sm text-muted-foreground">{b.jumlah} pengunjung</p>
-              <p className="mt-1 font-display text-xl font-black text-primary">{rupiah(b.pendapatan)}</p>
-            </div>
+        <p className="mb-3 font-display text-xl font-black">Riwayat Transaksi</p>
+
+        <div className="flex gap-2 border-b-2 border-border">
+          {TAB.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex-1 pb-3 text-center font-display text-base font-black transition ${
+                tab === t.id ? "border-b-4 border-primary text-primary" : "text-muted-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
           ))}
+        </div>
+
+        {/* Filter kategori — beda tiap tab */}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {tab === "tiket" ? (
+            (["semua", "dewasa", "anak"] as const).map((k) => (
+              <button
+                key={k}
+                onClick={() => setFilterKategoriTiket(k)}
+                className={`rounded-full px-3 py-1.5 text-xs font-black transition ${
+                  filterKategoriTiket === k
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                {k === "semua" ? "Semua" : LABEL[k]}
+              </button>
+            ))
+          ) : (
+            <>
+              <button
+                onClick={() => setFilterKategoriJajanan("semua")}
+                className={`rounded-full px-3 py-1.5 text-xs font-black transition ${
+                  filterKategoriJajanan === "semua"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                Semua
+              </button>
+              {kategoriJajananList.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setFilterKategoriJajanan(k)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-black transition ${
+                    filterKategoriJajanan === k
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {k}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+
+        <div className="mt-4">
+          {tab === "tiket" ? (
+            kelompokTiketRiwayat.length === 0 ? (
+              <p className="kartu-farm p-6 text-center text-lg font-bold text-muted-foreground">
+                Belum ada transaksi tiket{filterKategoriTiket !== "semua" ? ` kategori ${LABEL[filterKategoriTiket]}` : ""} di periode ini.
+              </p>
+            ) : (
+              <div className="space-y-6">
+                {kelompokTiketRiwayat.map((k) => (
+                  <div key={k.kunci}>
+                    <div className="mb-2 flex items-baseline justify-between px-1">
+                      <p className="font-display text-lg font-black">{k.label}</p>
+                      <p className="text-sm font-bold text-muted-foreground">
+                        {k.totalTiket} tiket · {rupiah(k.totalUang)}
+                      </p>
+                    </div>
+                    <div className="kartu-farm divide-y-2 divide-dashed divide-border overflow-hidden">
+                      {k.list.map((t) => (
+                        <div key={t.kode} className="flex items-center gap-3 p-4">
+                          <span className="shrink-0 text-2xl">{t.kategori === "dewasa" ? "🧑‍🌾" : "🧒"}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-display text-lg font-black">{t.kode}</p>
+                            <p className="text-sm font-bold text-muted-foreground">
+                              {LABEL[t.kategori]} · {t.jumlah} orang · {jam(t.dibuatPada)}
+                            </p>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="font-display font-black text-primary">+{rupiah(t.total)}</p>
+                            <span
+                              className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-black ${
+                                t.dipakaiPada
+                                  ? "bg-secondary text-secondary-foreground"
+                                  : "bg-accent text-accent-foreground"
+                              }`}
+                            >
+                              {t.dipakaiPada ? "Sudah masuk" : "Belum dipakai"}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : kelompokJajananRiwayat.length === 0 ? (
+            <p className="kartu-farm p-6 text-center text-lg font-bold text-muted-foreground">
+              Belum ada transaksi jajanan{filterKategoriJajanan !== "semua" ? ` kategori "${filterKategoriJajanan}"` : ""} di periode ini.
+            </p>
+          ) : (
+            <div className="space-y-6">
+              {kelompokJajananRiwayat.map((k) => (
+                <div key={k.kunci}>
+                  <div className="mb-2 flex items-baseline justify-between px-1">
+                    <p className="font-display text-lg font-black">{k.label}</p>
+                    <p className="text-sm font-bold text-muted-foreground">
+                      {k.totalItem} item · {rupiah(k.totalUang)}
+                    </p>
+                  </div>
+                  <div className="kartu-farm divide-y-2 divide-dashed divide-border overflow-hidden">
+                    {k.list.map((p) => (
+                      <div key={p.kode} className="flex items-center gap-3 p-4">
+                        <span className="shrink-0 text-2xl">{p.metode === "qris" ? "📱" : "💵"}</span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-display text-lg font-black">{p.kode}</p>
+                          <p className="truncate text-sm font-bold text-muted-foreground">
+                            {p.item.map((i) => `${i.nama}×${i.qty}`).join(", ")} · {jam(p.waktu)}
+                          </p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p className="font-display font-black text-primary">+{rupiah(p.total)}</p>
+                          <span className="mt-1 inline-block rounded-full bg-secondary px-2.5 py-0.5 text-xs font-black text-secondary-foreground">
+                            {p.metode === "qris" ? "QRIS" : "Cash"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Produk terlaris */}
+      {/* Produk terlaris — ngikut filter kategori jajanan di atas */}
       <div className="mt-6">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="font-display text-xl font-black">🏆 Produk Terlaris</p>
-          {kategoriJajananList.length > 0 ? (
-            <select
-              value={filterKategoriJajanan}
-              onChange={(e) => setFilterKategoriJajanan(e.target.value)}
-              className="rounded-full border-2 border-border bg-background px-3 py-1 text-xs font-black"
-            >
-              <option value="semua">Semua Kategori</option>
-              {kategoriJajananList.map((k) => (
-                <option key={k} value={k}>
-                  {k}
-                </option>
-              ))}
-            </select>
-          ) : null}
-        </div>
+        <p className="mb-3 font-display text-xl font-black">🏆 Produk Terlaris</p>
         {terlaris.length === 0 ? (
           <p className="kartu-farm p-5 text-center text-sm font-bold text-muted-foreground">
             Belum ada penjualan jajanan{filterKategoriJajanan !== "semua" ? ` di kategori "${filterKategoriJajanan}"` : ""} di periode ini.
