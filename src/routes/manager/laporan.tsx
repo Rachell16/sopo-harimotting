@@ -96,26 +96,49 @@ function LaporanManagerPage() {
   const labaRugi = totalPendapatan - totalPengeluaran;
   const jumlahMenunggu = semuaTiket.filter((t) => t.status === "menunggu").length;
 
+  // Filter tambahan: kunjungan bisa difilter per kategori tiket, produk terlaris
+  // bisa difilter per kategori jajanan — gak ngubah Total Pendapatan/Laba-Rugi
+  // (itu tetap angka utuh seluruh bisnis), cuma nyaring 2 section analitik ini aja.
+  const [filterKategoriTiket, setFilterKategoriTiket] = useState<"semua" | "dewasa" | "anak">("semua");
+  const [filterKategoriJajanan, setFilterKategoriJajanan] = useState<string>("semua");
+
+  const tiketUntukKunjungan = useMemo(
+    () => (filterKategoriTiket === "semua" ? tiket : tiket.filter((t) => t.kategori === filterKategoriTiket)),
+    [tiket, filterKategoriTiket],
+  );
+
+  const kategoriJajananList = useMemo(() => Array.from(new Set(produk.map((p) => p.kategori))).sort(), [produk]);
+  const produkKategoriMap = useMemo(() => new Map(produk.map((p) => [p.kode, p.kategori])), [produk]);
+  const jajananUntukTerlaris = useMemo(() => {
+    if (filterKategoriJajanan === "semua") return jajanan;
+    return jajanan
+      .map((p) => ({ ...p, item: p.item.filter((i) => produkKategoriMap.get(i.kode) === filterKategoriJajanan) }))
+      .filter((p) => p.item.length > 0);
+  }, [jajanan, filterKategoriJajanan, produkKategoriMap]);
+
   // Analitik: pola kunjungan, produk terlaris, breakdown tiket, stok menipis.
-  const kunjunganHari = useMemo(() => kunjunganPerHariMinggu(tiket), [tiket]);
+  const kunjunganHari = useMemo(() => kunjunganPerHariMinggu(tiketUntukKunjungan), [tiketUntukKunjungan]);
   const hariRamai = useMemo(
     () => [...kunjunganHari].sort((a, b) => b.jumlah - a.jumlah)[0],
     [kunjunganHari],
   );
-  const terlaris = useMemo(() => produkTerlaris(jajanan, 5), [jajanan]);
+  const terlaris = useMemo(() => produkTerlaris(jajananUntukTerlaris, 5), [jajananUntukTerlaris]);
   const breakdownTiket = useMemo(() => breakdownKategoriTiket(tiket), [tiket]);
   const menipis = useMemo(() => stokMenipis(produk, 5), [produk]);
 
+  // Rekomendasi tetap dari data UTUH (bukan yang difilter) biar gambarannya lengkap.
+  const kunjunganHariUtuh = useMemo(() => kunjunganPerHariMinggu(tiket), [tiket]);
+  const terlarisUtuh = useMemo(() => produkTerlaris(jajanan, 5), [jajanan]);
   const rekomendasiList = useMemo(
     () =>
       buatRekomendasiLokal({
-        kunjunganHari,
-        terlaris,
+        kunjunganHari: kunjunganHariUtuh,
+        terlaris: terlarisUtuh,
         menipis,
         labaRugi,
         totalPendapatan,
       }),
-    [kunjunganHari, terlaris, menipis, labaRugi, totalPendapatan],
+    [kunjunganHariUtuh, terlarisUtuh, menipis, labaRugi, totalPendapatan],
   );
 
   // Data grafik — gabungan pendapatan tiket + jajanan per tanggal, urut lama ke baru.
@@ -317,7 +340,24 @@ function LaporanManagerPage() {
 
       {/* Kunjungan per hari — buat lihat hari mana paling ramai */}
       <div className="kartu-farm mt-6 p-4">
-        <p className="font-display text-xl font-black">Kunjungan per Hari</p>
+        <div className="flex items-center justify-between">
+          <p className="font-display text-xl font-black">Kunjungan per Hari</p>
+          <div className="flex gap-1.5">
+            {(["semua", "dewasa", "anak"] as const).map((k) => (
+              <button
+                key={k}
+                onClick={() => setFilterKategoriTiket(k)}
+                className={`rounded-full px-3 py-1 text-xs font-black transition ${
+                  filterKategoriTiket === k
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                {k === "semua" ? "Semua" : LABEL[k]}
+              </button>
+            ))}
+          </div>
+        </div>
         {hariRamai && hariRamai.jumlah > 0 ? (
           <p className="mt-1 text-sm text-muted-foreground">
             Paling ramai: <span className="font-black text-foreground">{hariRamai.hari}</span> ({hariRamai.jumlah}{" "}
@@ -356,10 +396,26 @@ function LaporanManagerPage() {
 
       {/* Produk terlaris */}
       <div className="mt-6">
-        <p className="mb-3 font-display text-xl font-black">🏆 Produk Terlaris</p>
+        <div className="mb-3 flex items-center justify-between">
+          <p className="font-display text-xl font-black">🏆 Produk Terlaris</p>
+          {kategoriJajananList.length > 0 ? (
+            <select
+              value={filterKategoriJajanan}
+              onChange={(e) => setFilterKategoriJajanan(e.target.value)}
+              className="rounded-full border-2 border-border bg-background px-3 py-1 text-xs font-black"
+            >
+              <option value="semua">Semua Kategori</option>
+              {kategoriJajananList.map((k) => (
+                <option key={k} value={k}>
+                  {k}
+                </option>
+              ))}
+            </select>
+          ) : null}
+        </div>
         {terlaris.length === 0 ? (
           <p className="kartu-farm p-5 text-center text-sm font-bold text-muted-foreground">
-            Belum ada penjualan jajanan di periode ini.
+            Belum ada penjualan jajanan{filterKategoriJajanan !== "semua" ? ` di kategori "${filterKategoriJajanan}"` : ""} di periode ini.
           </p>
         ) : (
           <div className="kartu-farm divide-y-2 divide-dashed divide-border overflow-hidden">
