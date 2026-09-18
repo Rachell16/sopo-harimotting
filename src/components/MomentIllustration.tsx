@@ -1,6 +1,27 @@
 // Ilustrasi kecil bergaya sama dengan hero (siluet + gradasi hangat), dipakai
 // sebagai pengganti kotak "foto belum ada" yang diulang-ulang. Begitu foto asli
 // tersedia, section yang memanggil ini tinggal diganti ke <img>.
+
+// export function MomentIllustration({
+//   variasi,
+//   foto,
+// }: {
+//   variasi: "kuda" | "kelinci" | "gazebo" | "warung";
+//   foto?: string; // contoh: "/images/kuda-1.jpg"
+// }) {
+//   // Kalau foto asli udah ada, tampilin itu aja, ilustrasi SVG di-skip semua
+//   if (foto) {
+//     return (
+//       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
+//         <img src={foto} alt={variasi} className="h-full w-full object-cover" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
+//       {/* ...semua kode SVG yang udah ada, biarin aja gak usah diubah... */}
+
 export function MomentIllustration({ variasi }: { variasi: "kuda" | "kelinci" | "gazebo" | "warung" }) {
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
