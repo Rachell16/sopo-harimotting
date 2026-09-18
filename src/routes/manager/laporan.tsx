@@ -94,6 +94,7 @@ function LaporanManagerPage() {
   const totalPengeluaranLain = pengeluaran.reduce((a, p) => a + p.jumlah, 0);
   const totalPengeluaran = totalGaji + totalPengeluaranLain;
   const labaRugi = totalPendapatan - totalPengeluaran;
+  const jumlahMenunggu = semuaTiket.filter((t) => t.status === "menunggu").length;
 
   // Analitik: pola kunjungan, produk terlaris, breakdown tiket, stok menipis.
   const kunjunganHari = useMemo(() => kunjunganPerHariMinggu(tiket), [tiket]);
@@ -222,6 +223,16 @@ function LaporanManagerPage() {
       label="Sopo Harimoting · Manager"
       menu={MENU_MANAGER}
     >
+      {jumlahMenunggu > 0 ? (
+        <Link
+          to="/admin/verifikasi"
+          className="mb-4 flex items-center justify-between rounded-2xl bg-accent px-4 py-3 font-black text-accent-foreground shadow-farm"
+        >
+          <span>⏳ {jumlahMenunggu} pesanan menunggu verifikasi</span>
+          <span>Cek →</span>
+        </Link>
+      ) : null}
+
       {/* Filter periode */}
       <div className="flex gap-2">
         {FILTER.map((f) => (
