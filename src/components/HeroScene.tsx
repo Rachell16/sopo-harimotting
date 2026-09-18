@@ -119,7 +119,7 @@ export function HeroScene() {
       {/* FOTO BACKGROUND */}
       <div className="hero-anim-zoom absolute inset-0">
         <img
-          src="/Users/racheltobing16/sopo-harimoting/sopo-harimoting/src/components/image.png"
+          src="/image.png"
           className="h-full w-full object-cover"
         />
       </div>
