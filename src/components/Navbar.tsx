@@ -30,14 +30,17 @@ export function Navbar() {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
-        <a href="#" className="flex items-center gap-2 text-cream">
-          <span className="hero-anim-zoom absolute inset-0">
-            <img src="/favicon.ico" className="h-full w-full object-cover" />
-          </span>
-          <span className="font-display text-lg font-black tracking-tight sm:text-xl">
-            Sopo Harimotting
-          </span>
-        </a>
+  <a href="#" className="flex items-center gap-2 text-cream">
+    <img
+      src="/favicon.ico"
+      className="h-8 w-8 object-contain"
+    />
+
+    <span className="font-display text-lg font-black tracking-tight sm:text-xl">
+      Sopo Harimotting
+    </span>
+  </a>
+</div>
 
         <div className="hidden items-center gap-6 sm:flex">
           {NAV_LINKS.map((l) => (
