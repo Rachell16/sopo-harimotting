@@ -254,7 +254,7 @@ function LandingPage() {
                 className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
               >
                 <img
-                  src="public/icon/wa.png"
+                  src="/icon/wa.png"
                   className="h-9 w-9 object-cover rounded-full"
                 />
                 <span className="text-sm font-black">WhatsApp</span>
@@ -267,7 +267,7 @@ function LandingPage() {
                 className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
               >
                 <img
-                  src="public/icon/ig.png"
+                  src="/icon/ig.png"
                   className="h-9 w-9 object-cover rounded-full"
                 />
                 <span className="text-sm font-black">Instagram</span>
@@ -280,7 +280,7 @@ function LandingPage() {
                 className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
               >
                 <img
-                  src="public/icon/tiktok.png"
+                  src="/icon/tiktok.png"
                   className="h-9 w-9 object-cover rounded-full"
                 />
                 <span className="text-sm font-black">TikTok</span>
