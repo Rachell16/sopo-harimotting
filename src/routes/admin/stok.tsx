@@ -5,8 +5,16 @@ import * as XLSX from "xlsx";
 import { AppShell } from "@/components/AppShell";
 import { MENU_ADMIN } from "@/lib/admin-menu";
 import { rupiah } from "@/lib/tickets";
-import { ambilProduk, buatProduk, hapusProduk, importProdukMassal, updateProduk } from "@/lib/warung.server";
-import type { Produk } from "@/lib/warung";
+import {
+  ambilKategoriProduk,
+  ambilProduk,
+  buatProduk,
+  hapusKategoriProduk,
+  hapusProduk,
+  importProdukMassal,
+  tambahKategoriProduk,
+  updateProduk,
+} from "@/lib/warung.server";
 
 export const Route = createFileRoute("/admin/stok")({
   head: () => ({
@@ -24,6 +32,15 @@ function StokPage() {
     queryFn: () => ambilProduk(),
     refetchInterval: 5000,
   });
+  const { data: kategoriList } = useQuery({
+    queryKey: ["kategori-produk"],
+    queryFn: () => ambilKategoriProduk(),
+    refetchInterval: 5000,
+  });
+
+  const [kategoriDipilih, setKategoriDipilih] = useState<string | null>(null);
+  const [modalKategoriBaru, setModalKategoriBaru] = useState(false);
+  const [namaKategoriBaru, setNamaKategoriBaru] = useState("");
 
   const [form, setForm] = useState<{
     kode: string | null;
@@ -33,7 +50,6 @@ function StokPage() {
     stok: string;
   } | null>(null);
 
-  const daftarKategori = Array.from(new Set((produk ?? []).map((p) => p.kategori))).sort();
   const [pratinjauImpor, setPratinjauImpor] = useState<BarisImpor[] | null>(null);
   const [pesanImporError, setPesanImporError] = useState<string | null>(null);
   const fileImporRef = useRef<HTMLInputElement>(null);
@@ -54,6 +70,7 @@ function StokPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["produk"] });
+      queryClient.invalidateQueries({ queryKey: ["kategori-produk"] });
       setForm(null);
     },
   });
@@ -63,10 +80,28 @@ function StokPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["produk"] }),
   });
 
+  const tambahKategoriMutation = useMutation({
+    mutationFn: (nama: string) => tambahKategoriProduk({ data: nama }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["kategori-produk"] });
+      setModalKategoriBaru(false);
+      setNamaKategoriBaru("");
+    },
+  });
+
+  const hapusKategoriMutation = useMutation({
+    mutationFn: (nama: string) => hapusKategoriProduk({ data: nama }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["kategori-produk"] });
+      setKategoriDipilih(null);
+    },
+  });
+
   const importMutation = useMutation({
     mutationFn: (items: BarisImpor[]) => importProdukMassal({ data: items }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["produk"] });
+      queryClient.invalidateQueries({ queryKey: ["kategori-produk"] });
       setPratinjauImpor(null);
     },
   });
@@ -103,76 +138,168 @@ function StokPage() {
     reader.readAsBinaryString(file);
   }
 
+  const produkDiKategori = (kat: string) => (produk ?? []).filter((p) => p.kategori === kat);
+
   return (
     <AppShell
       title="Stok Jajanan"
-      subtitle="Kelola produk yang dijual di warung"
+      subtitle={kategoriDipilih ?? "Kelola produk yang dijual di warung"}
       label="Sopo Harimoting · Admin"
       menu={MENU_ADMIN}
     >
-      <div className="mb-5 grid grid-cols-2 gap-3">
-        <button
-          onClick={() => setForm({ kode: null, nama: "", kategori: "", harga: "", stok: "" })}
-          className="rounded-2xl bg-accent px-4 py-4 text-center font-display text-lg font-black text-accent-foreground shadow-lift"
-        >
-          + Tambah
-        </button>
-        <button
-          onClick={() => fileImporRef.current?.click()}
-          className="rounded-2xl bg-secondary px-4 py-4 text-center font-display text-lg font-black text-secondary-foreground"
-        >
-          📥 Import Excel
-        </button>
-        <input
-          ref={fileImporRef}
-          type="file"
-          accept=".xlsx,.xls,.csv"
-          className="hidden"
-          onChange={(e) => bacaFileExcel(e.target.files?.[0])}
-        />
-      </div>
+      {kategoriDipilih === null ? (
+        <>
+          {/* ---------- Langkah 1: daftar kategori ---------- */}
+          <div className="mb-5 grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setModalKategoriBaru(true)}
+              className="rounded-2xl bg-accent px-4 py-4 text-center font-display text-lg font-black text-accent-foreground shadow-lift"
+            >
+              + Kategori
+            </button>
+            <button
+              onClick={() => fileImporRef.current?.click()}
+              className="rounded-2xl bg-secondary px-4 py-4 text-center font-display text-lg font-black text-secondary-foreground"
+            >
+              📥 Import Excel
+            </button>
+            <input
+              ref={fileImporRef}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              className="hidden"
+              onChange={(e) => bacaFileExcel(e.target.files?.[0])}
+            />
+          </div>
 
-      {pesanImporError ? (
-        <p className="mb-4 kartu-farm p-3 text-center text-sm font-bold text-destructive">{pesanImporError}</p>
-      ) : null}
+          {pesanImporError ? (
+            <p className="mb-4 kartu-farm p-3 text-center text-sm font-bold text-destructive">{pesanImporError}</p>
+          ) : null}
 
-      {!produk || produk.length === 0 ? (
-        <p className="kartu-farm p-6 text-center text-lg font-bold text-muted-foreground">
-          Belum ada produk. Tambahin dulu yuk, satu-satu atau sekalian import Excel.
-        </p>
+          {!kategoriList || kategoriList.length === 0 ? (
+            <p className="kartu-farm p-6 text-center text-lg font-bold text-muted-foreground">
+              Belum ada kategori. Bikin dulu yuk, atau langsung import Excel.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {kategoriList.map((kat) => (
+                <button
+                  key={kat}
+                  onClick={() => setKategoriDipilih(kat)}
+                  className="kartu-farm p-5 text-left transition active:scale-95 hover:-translate-y-1 hover:shadow-lift"
+                >
+                  <p className="font-display text-lg font-black">{kat}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{produkDiKategori(kat).length} produk</p>
+                </button>
+              ))}
+            </div>
+          )}
+        </>
       ) : (
-        <div className="kartu-farm divide-y-2 divide-dashed divide-border overflow-hidden">
-          {produk.map((p: Produk) => (
-            <div key={p.kode} className="flex items-center gap-3 p-4">
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-display text-lg font-black">{p.nama}</p>
-                <p className="text-sm font-bold text-muted-foreground">
-                  {p.kategori} · {rupiah(p.harga)} ·{" "}
-                  <span className={p.stok === 0 ? "text-destructive" : ""}>Stok: {p.stok}</span>
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  setForm({ kode: p.kode, nama: p.nama, kategori: p.kategori, harga: String(p.harga), stok: String(p.stok) })
-                }
-                className="shrink-0 rounded-xl bg-secondary px-3 py-2 text-sm font-black text-secondary-foreground"
-              >
-                Edit
-              </button>
+        <>
+          {/* ---------- Langkah 2: produk dalam kategori ---------- */}
+          <div className="mb-4 flex items-center justify-between">
+            <button
+              onClick={() => setKategoriDipilih(null)}
+              className="text-sm font-bold text-muted-foreground underline"
+            >
+              ← Ganti kategori
+            </button>
+            {produkDiKategori(kategoriDipilih).length === 0 ? (
               <button
                 onClick={() => {
-                  if (confirm(`Hapus "${p.nama}" dari daftar produk?`)) hapusMutation.mutate(p.kode);
+                  if (confirm(`Hapus kategori "${kategoriDipilih}"?`)) hapusKategoriMutation.mutate(kategoriDipilih);
                 }}
-                className="shrink-0 rounded-xl bg-destructive/10 px-3 py-2 text-sm font-black text-destructive"
+                className="text-sm font-bold text-destructive underline"
               >
-                Hapus
+                Hapus kategori ini
               </button>
+            ) : null}
+          </div>
+
+          <button
+            onClick={() => setForm({ kode: null, nama: "", kategori: kategoriDipilih, harga: "", stok: "" })}
+            className="mb-5 w-full rounded-2xl bg-accent px-4 py-4 text-center font-display text-xl font-black text-accent-foreground shadow-lift"
+          >
+            + Tambah Produk di "{kategoriDipilih}"
+          </button>
+
+          {produkDiKategori(kategoriDipilih).length === 0 ? (
+            <p className="kartu-farm p-6 text-center text-lg font-bold text-muted-foreground">
+              Belum ada produk di kategori ini.
+            </p>
+          ) : (
+            <div className="kartu-farm divide-y-2 divide-dashed divide-border overflow-hidden">
+              {produkDiKategori(kategoriDipilih).map((p) => (
+                <div key={p.kode} className="flex items-center gap-3 p-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-display text-lg font-black">{p.nama}</p>
+                    <p className="text-sm font-bold text-muted-foreground">
+                      {rupiah(p.harga)} ·{" "}
+                      <span className={p.stok === 0 ? "text-destructive" : ""}>Stok: {p.stok}</span>
+                    </p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      setForm({ kode: p.kode, nama: p.nama, kategori: p.kategori, harga: String(p.harga), stok: String(p.stok) })
+                    }
+                    className="shrink-0 rounded-xl bg-secondary px-3 py-2 text-sm font-black text-secondary-foreground"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm(`Hapus "${p.nama}" dari daftar produk?`)) hapusMutation.mutate(p.kode);
+                    }}
+                    className="shrink-0 rounded-xl bg-destructive/10 px-3 py-2 text-sm font-black text-destructive"
+                  >
+                    Hapus
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
-      {/* Form tambah/edit — modal sederhana */}
+      {/* Modal tambah kategori baru */}
+      {modalKategoriBaru ? (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4"
+          onClick={() => setModalKategoriBaru(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-t-3xl bg-card p-6 shadow-2xl sm:rounded-3xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-display text-2xl font-black">Kategori Baru</p>
+            <input
+              value={namaKategoriBaru}
+              onChange={(e) => setNamaKategoriBaru(e.target.value)}
+              placeholder="Contoh: Minuman Dingin"
+              className="mt-4 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
+              autoFocus
+            />
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setModalKategoriBaru(false)}
+                className="flex-1 rounded-xl bg-secondary px-4 py-4 font-black text-secondary-foreground"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => namaKategoriBaru.trim() && tambahKategoriMutation.mutate(namaKategoriBaru.trim())}
+                disabled={!namaKategoriBaru.trim() || tambahKategoriMutation.isPending}
+                className="flex-1 rounded-xl bg-accent px-4 py-4 font-black text-accent-foreground disabled:opacity-60"
+              >
+                {tambahKategoriMutation.isPending ? "..." : "Simpan"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Form tambah/edit produk — modal sederhana */}
       {form ? (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4"
@@ -204,7 +331,7 @@ function StokPage() {
               className="mt-1 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
             />
             <datalist id="daftar-kategori">
-              {daftarKategori.map((k) => (
+              {(kategoriList ?? []).map((k) => (
                 <option key={k} value={k} />
               ))}
             </datalist>
@@ -265,7 +392,9 @@ function StokPage() {
             <div className="mt-4 max-h-64 space-y-1 overflow-y-auto rounded-xl border-2 border-border p-2">
               {pratinjauImpor.map((r, i) => (
                 <div key={i} className="flex items-center justify-between text-sm">
-                  <span className="truncate font-bold">{r.nama}</span>
+                  <span className="truncate font-bold">
+                    {r.nama} <span className="text-muted-foreground">({r.kategori})</span>
+                  </span>
                   <span className="shrink-0 text-muted-foreground">
                     {rupiah(r.harga)} · stok {r.stok}
                   </span>

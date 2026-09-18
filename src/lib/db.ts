@@ -46,6 +46,12 @@ export async function pastikanSkema() {
   `;
   await sql`ALTER TABLE produk ADD COLUMN IF NOT EXISTS kategori TEXT NOT NULL DEFAULT 'Lainnya'`;
   await sql`
+    CREATE TABLE IF NOT EXISTS kategori_produk (
+      nama TEXT PRIMARY KEY,
+      dibuat_pada TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`
     CREATE TABLE IF NOT EXISTS penjualan_warung (
       kode TEXT PRIMARY KEY,
       item JSONB NOT NULL,

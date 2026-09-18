@@ -45,6 +45,57 @@ function barisKePenjualan(r: BarisPenjualan): Penjualan {
 // sama seperti mode demo di tickets.server.ts.
 const produkDemo: Produk[] = [];
 const penjualanDemo: Penjualan[] = [];
+const kategoriDemo: string[] = [];
+
+// ---------- Kategori produk ----------
+
+// Gabungan kategori yang "resmi" dibikin (biar bisa ada kategori kosong dulu
+// sebelum ada produknya) + kategori yang kepakai di produk (dari import lama).
+export const ambilKategoriProduk = createServerFn({ method: "GET" }).handler(async (): Promise<string[]> => {
+  if (MODE_DEMO) {
+    const dariProduk = produkDemo.map((p) => p.kategori);
+    return Array.from(new Set([...kategoriDemo, ...dariProduk])).sort();
+  }
+
+  await pastikanSkema();
+  const rows = (await sql`
+    SELECT nama FROM kategori_produk
+    UNION
+    SELECT DISTINCT kategori AS nama FROM produk
+    ORDER BY nama ASC
+  `) as { nama: string }[];
+  return rows.map((r) => r.nama);
+});
+
+export const tambahKategoriProduk = createServerFn({ method: "POST" })
+  .validator((nama: string) => nama)
+  .handler(async ({ data: nama }): Promise<{ ok: true }> => {
+    const bersih = nama.trim();
+    if (!bersih) throw new Error("Nama kategori gak boleh kosong");
+
+    if (MODE_DEMO) {
+      if (!kategoriDemo.includes(bersih)) kategoriDemo.push(bersih);
+      return { ok: true };
+    }
+
+    await pastikanSkema();
+    await sql`INSERT INTO kategori_produk (nama) VALUES (${bersih}) ON CONFLICT (nama) DO NOTHING`;
+    return { ok: true };
+  });
+
+export const hapusKategoriProduk = createServerFn({ method: "POST" })
+  .validator((nama: string) => nama)
+  .handler(async ({ data: nama }): Promise<{ ok: true }> => {
+    if (MODE_DEMO) {
+      const idx = kategoriDemo.indexOf(nama);
+      if (idx !== -1) kategoriDemo.splice(idx, 1);
+      return { ok: true };
+    }
+
+    await pastikanSkema();
+    await sql`DELETE FROM kategori_produk WHERE nama = ${nama}`;
+    return { ok: true };
+  });
 
 // ---------- Produk (stok) ----------
 
@@ -83,6 +134,7 @@ export const buatProduk = createServerFn({ method: "POST" })
           VALUES (${kode}, ${data.nama}, ${kategori}, ${data.harga}, ${data.stok})
           RETURNING *
         `) as BarisProduk[];
+        await sql`INSERT INTO kategori_produk (nama) VALUES (${kategori}) ON CONFLICT (nama) DO NOTHING`;
         return barisKeProduk(rows[0]!);
       } catch (err: any) {
         if (err?.code === "23505") continue;
