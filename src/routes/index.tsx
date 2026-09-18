@@ -146,14 +146,8 @@ function LandingPage() {
             </p>
           </Reveal>
 
-          {/* MOMEN — carousel, bisa di-slide & diklik buat pop-up */}
+          {/* MOMEN — carousel geser horizontal, beberapa kartu keliatan sekaligus */}
           <Reveal id="momen" className="mb-16 scroll-mt-24">
-            <h2 className="mb-1 font-display text-4xl font-black">
-              Momen di Sini
-            </h2>
-            <p className="mb-6 text-muted-foreground">
-              Geser atau klik foto untuk lihat lebih besar — foto asli menyusul.
-            </p>
             <MomentCarousel slide={MOMEN} />
           </Reveal>
 

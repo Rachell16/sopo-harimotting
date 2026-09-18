@@ -21,92 +21,105 @@ export type SlideMomen = {
 //
 //   { variasi: "kolam-ikan", judul: "Kolam Ikan", teks: "Deskripsi singkatnya di sini." }
 //
-// Itu aja — carousel, titik indikator, sama nomor slide di bawah semua
-// otomatis nyesuain jumlah slide, gak perlu ubah apa-apa di file ini.
+// Itu aja — kartu baru otomatis nongol di ujung deretan, jumlah kartu yang
+// keliatan sekaligus juga otomatis nyesuain lebar layar. Gak perlu ubah
+// apa-apa di file ini.
 // ============================================================================
 
 export function MomentCarousel({ slide }: { slide: SlideMomen[] }) {
+  const trackRef = useRef<HTMLDivElement>(null);
   const [aktif, setAktif] = useState(0);
   const [popup, setPopup] = useState<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Autoplay — jeda kalau lagi pop-up dibuka.
+  // Deteksi kartu mana yang lagi paling keliatan di layar, buat nomor "01/03".
   useEffect(() => {
-    if (popup !== null) return;
-    timerRef.current = setInterval(() => {
-      setAktif((n) => (n + 1) % slide.length);
-    }, 4200);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [popup, slide.length]);
+    const track = trackRef.current;
+    if (!track) return;
+    function onScroll() {
+      const kartu = track!.querySelector<HTMLElement>("[data-kartu]");
+      if (!kartu) return;
+      const lebarLangkah = kartu.offsetWidth + 16; // 16 = gap-4
+      const idx = Math.round(track!.scrollLeft / lebarLangkah);
+      setAktif(Math.max(0, Math.min(slide.length - 1, idx)));
+    }
+    track.addEventListener("scroll", onScroll, { passive: true });
+    return () => track.removeEventListener("scroll", onScroll);
+  }, [slide.length]);
+
+  function geser(arah: 1 | -1) {
+    const track = trackRef.current;
+    if (!track) return;
+    const kartu = track.querySelector<HTMLElement>("[data-kartu]");
+    if (!kartu) return;
+    track.scrollBy({ left: arah * (kartu.offsetWidth + 16), behavior: "smooth" });
+  }
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-3xl border-4 border-wood shadow-lift">
-        <div className="overflow-hidden">
-          <div
-            className="flex transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
-            style={{ transform: `translateX(-${aktif * 100}%)` }}
-          >
-            {slide.map((m, i) => (
-              <button
-                key={m.judul}
-                onClick={() => setPopup(i)}
-                className="w-full shrink-0 text-left"
-                aria-label={`Lihat lebih besar: ${m.judul}`}
-              >
-                <div className="relative">
-                  <MomentIllustration variasi={m.variasi} foto={m.foto} />
-                  <div className="absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/70 via-black/10 to-black/30 p-5">
-                    {/* Nomor slide, gaya "01 / 03" kayak carousel destinasi situs wisata besar */}
-                    <div className="flex justify-between">
-                      <span className="rounded-full bg-cream/90 px-3 py-1 font-display text-sm font-black text-wood-dark shadow">
-                        {String(i + 1).padStart(2, "0")} / {String(slide.length).padStart(2, "0")}
-                      </span>
-                      <span className="rounded-full bg-cream/90 px-3 py-1 text-xs font-bold text-wood-dark shadow">
-                        🔍 Perbesar
-                      </span>
-                    </div>
-
-                    <div className="text-cream">
-                      <p className="font-display text-2xl font-black drop-shadow sm:text-3xl">{m.judul}</p>
-                      <p className="mt-1 text-sm opacity-95 sm:text-base">{m.teks}</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
+      {/* Header baris: judul di kiri, nomor + panah navigasi di kanan —
+          pola yang sama kayak carousel destinasi di situs wisata besar. */}
+      <div className="mb-4 flex items-end justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-primary/70">Galeri</p>
+          <h2 className="font-display text-3xl font-black sm:text-4xl">Momen di Sini</h2>
         </div>
+        <div className="flex shrink-0 items-center gap-3">
+          <span className="font-display text-base font-black text-muted-foreground">
+            {String(aktif + 1).padStart(2, "0")} / {String(slide.length).padStart(2, "0")}
+          </span>
+          <button
+            onClick={() => geser(-1)}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-lg font-black text-secondary-foreground transition hover:scale-110"
+            aria-label="Sebelumnya"
+          >
+            ‹
+          </button>
+          <button
+            onClick={() => geser(1)}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-lg font-black text-secondary-foreground transition hover:scale-110"
+            aria-label="Berikutnya"
+          >
+            ›
+          </button>
+        </div>
+      </div>
 
-        {/* Tombol panah — lebih gede & selalu keliatan, senada bingkai kayu */}
-        <button
-          onClick={() => setAktif((n) => (n - 1 + slide.length) % slide.length)}
-          className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-cream text-xl font-black text-wood-dark shadow-lift transition hover:scale-110 sm:h-12 sm:w-12"
-          aria-label="Sebelumnya"
-        >
-          ‹
-        </button>
-        <button
-          onClick={() => setAktif((n) => (n + 1) % slide.length)}
-          className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-cream text-xl font-black text-wood-dark shadow-lift transition hover:scale-110 sm:h-12 sm:w-12"
-          aria-label="Berikutnya"
-        >
-          ›
-        </button>
+      {/* Deretan kartu — scroll horizontal native, beberapa kartu keliatan
+          sekaligus (bukan 1 slide penuh layar kayak sebelumnya). */}
+      <div
+        ref={trackRef}
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {slide.map((m, i) => (
+          <button
+            key={m.judul}
+            data-kartu
+            onClick={() => setPopup(i)}
+            className="w-[68%] shrink-0 snap-start text-left sm:w-[42%] lg:w-[30%]"
+            aria-label={`Lihat lebih besar: ${m.judul}`}
+          >
+            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border-4 border-wood shadow-lift">
+              <MomentIllustration variasi={m.variasi} foto={m.foto} />
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4">
+                <p className="font-display text-lg font-black leading-tight text-cream drop-shadow sm:text-xl">
+                  {m.judul}
+                </p>
+                <p className="mt-1 line-clamp-2 text-xs text-cream/90 sm:text-sm">{m.teks}</p>
+                <span className="mt-3 inline-block rounded-full bg-cream px-3 py-1.5 text-center text-xs font-black text-wood-dark">
+                  Lihat lebih besar
+                </span>
+              </div>
+            </div>
+          </button>
+        ))}
       </div>
 
       {/* Titik indikator */}
       <div className="mt-4 flex justify-center gap-2">
         {slide.map((m, i) => (
-          <button
+          <span
             key={m.judul}
-            onClick={() => setAktif(i)}
-            aria-label={`Ke slide ${i + 1}`}
-            className={`h-2 rounded-full transition-all ${
-              i === aktif ? "w-7 bg-primary" : "w-2 bg-primary/30"
-            }`}
+            className={`h-2 rounded-full transition-all ${i === aktif ? "w-7 bg-primary" : "w-2 bg-primary/30"}`}
           />
         ))}
       </div>
