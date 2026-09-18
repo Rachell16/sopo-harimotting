@@ -184,14 +184,14 @@ function LandingPage() {
             </h2>
             <div className="mx-auto grid max-w-md grid-cols-2 gap-6">
               <div className="kartu-tiket p-5 text-center transition hover:-translate-y-1">
-                <span className="text-3xl">🧑‍🌾</span>
+                <img src="/icon/dewasa.jpg" alt="Dewasa" className="h-9 w-9 object-cover rounded-full" />
                 <p className="mt-1 font-display text-lg font-black">Dewasa</p>
                 <p className="font-display text-3xl font-black text-primary">
                   {rupiah(HARGA.dewasa)}
                 </p>
               </div>
               <div className="kartu-tiket p-5 text-center transition hover:-translate-y-1">
-                <span className="text-3xl">🧒</span>
+                <img src="/icon/anak.jpg" alt="Anak" className="h-9 w-9 object-cover rounded-full" />
                 <p className="mt-1 font-display text-lg font-black">Anak</p>
                 <p className="font-display text-3xl font-black text-primary">
                   {rupiah(HARGA.anak)}
