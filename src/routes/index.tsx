@@ -253,7 +253,10 @@ function LandingPage() {
                 rel="noopener noreferrer"
                 className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
               >
-                <img src="public/icon/wa.png" alt="WhatsApp" className="h-9 w-9 object-cover rounded-full" />
+                <img
+                  src="public/icon/wa.png"
+                  className="h-9 w-9 object-cover rounded-full"
+                />
                 <span className="text-sm font-black">WhatsApp</span>
               </a>
 
@@ -263,7 +266,10 @@ function LandingPage() {
                 rel="noopener noreferrer"
                 className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
               >
-                <img src="public/icon/ig.png" alt="Instagram" className="h-9 w-9 object-cover rounded-full" />
+                <img
+                  src="public/icon/ig.png"
+                  className="h-9 w-9 object-cover rounded-full"
+                />
                 <span className="text-sm font-black">Instagram</span>
               </a>
 
@@ -273,7 +279,10 @@ function LandingPage() {
                 rel="noopener noreferrer"
                 className="kartu-farm flex flex-col items-center gap-2 p-4 text-center transition hover:-translate-y-1 hover:shadow-lift"
               >
-                <img src="public/icon/tiktok.png" alt="Tiktok" className="h-9 w-9 object-cover rounded-full" />
+                <img
+                  src="public/icon/tiktok.png"
+                  className="h-9 w-9 object-cover rounded-full"
+                />
                 <span className="text-sm font-black">TikTok</span>
               </a>
             </div>
