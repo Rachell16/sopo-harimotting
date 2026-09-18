@@ -30,32 +30,32 @@ export const Route = createFileRoute("/")({
 // tempel, ganti isinya. Urutannya otomatis selang-seling kiri-kanan sendiri.
 const FASILITAS = [
   {
-    ikon: "🐴",
+    ikon: "/icon/kuda.png",
     judul: "Lihat Kuda",
     teks: "Area kuda dan patung-patung hewan di taman, jadi spot favorit anak-anak.",
   },
   {
-    ikon: "🌳",
+    ikon: "/icon/pohon.png",
     judul: "Taman Terbuka",
     teks: "Rumput luas dan sejuk, cocok digelar tikar buat piknik keluarga.",
   },
   {
-    ikon: "🏕️",
+    ikon: "/icon/piknik.png",
     judul: "Gazebo Piknik",
     teks: "Tempat duduk teduh beratap jaring, nyaman buat istirahat sambil ngobrol.",
   },
   {
-    ikon: "🎪",
+    ikon: "/icon/taman.png",
     judul: "Area Bermain",
     teks: "Rintangan dan rumah pohon yang seru buat anak-anak berlari dan memanjat.",
   },
   {
-    ikon: "🛍️",
+    ikon: "/icon/cafe.png",
     judul: "Warung & Jajanan",
     teks: "Aneka snack dan minuman dingin tersedia langsung di lokasi.",
   },
   {
-    ikon: "📸",
+    ikon: "/icon/foto.png",
     judul: "Spot Foto",
     teks: "Banyak sudut menarik yang sayang dilewatkan buat foto keluarga.",
   },
@@ -143,7 +143,9 @@ function LandingPage() {
 
           {/* FASILITAS — kartu bulat kayak "5 Pilar" Kebun Raya */}
           <Reveal id="fasilitas" className="mb-16 scroll-mt-24 text-center">
-            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">Yang Bisa Dinikmati</p>
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">
+              Yang Bisa Dinikmati
+            </p>
             <h2 className="mb-8 font-display text-4xl font-black">Fasilitas</h2>
             <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
               {FASILITAS.map((f, i) => (
@@ -151,14 +153,22 @@ function LandingPage() {
                   key={f.judul}
                   className="kartu-farm flex flex-col items-center p-6 text-center transition hover:-translate-y-1 hover:shadow-lift"
                 >
-                  <span
-                    className="ikon-ayun flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-3xl"
+                  <div
+                    className="ikon-ayun flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-secondary"
                     style={{ animationDelay: `${i * 0.25}s` }}
                   >
-                    {f.ikon}
-                  </span>
-                  <p className="mt-4 font-display text-lg font-black">{f.judul}</p>
-                  <p className="mt-1.5 text-sm text-muted-foreground">{f.teks}</p>
+                    <img
+                      src={f.ikon}
+                      alt={f.judul}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <p className="mt-4 font-display text-lg font-black">
+                    {f.judul}
+                  </p>
+                  <p className="mt-1.5 text-sm text-muted-foreground">
+                    {f.teks}
+                  </p>
                 </div>
               ))}
             </div>
@@ -166,7 +176,9 @@ function LandingPage() {
 
           {/* HARGA TIKET — gaya kartu tiket bergerigi */}
           <Reveal id="harga" className="mb-16 scroll-mt-24 text-center">
-            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">Investasi Liburan</p>
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">
+              Investasi Liburan
+            </p>
             <h2 className="mb-6 font-display text-4xl font-black">
               Harga Tiket Masuk
             </h2>
@@ -198,7 +210,9 @@ function LandingPage() {
 
           {/* ALAMAT & LOKASI — panel gelap senada hero, kontras premium */}
           <Reveal id="lokasi" className="mb-4 scroll-mt-24 text-center">
-            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">Cara Sampai ke Sini</p>
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">
+              Cara Sampai ke Sini
+            </p>
             <h2 className="mb-6 font-display text-4xl font-black">Lokasi</h2>
             <div className="panel-kayu mx-auto max-w-2xl rounded-2xl p-6 text-left shadow-lift sm:p-8">
               <p className="font-bold opacity-90">📍 Alamat</p>
@@ -226,7 +240,9 @@ function LandingPage() {
 
           {/* KONTAK & SOSIAL MEDIA */}
           <Reveal className="mb-4 text-center">
-            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">Terhubung Terus</p>
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">
+              Terhubung Terus
+            </p>
             <h2 className="mb-6 font-display text-4xl font-black">
               Hubungi & Ikuti Kami
             </h2>
