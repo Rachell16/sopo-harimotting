@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeroScene } from "@/components/HeroScene";
 import { LatarAmbient } from "@/components/LatarAmbient";
 import { MomentCarousel, type SlideMomen } from "@/components/MomentCarousel";
+import { Navbar } from "@/components/Navbar";
 import { Reveal } from "@/components/Reveal";
 import { HARGA, rupiah } from "@/lib/tickets";
 
@@ -80,6 +81,7 @@ function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background pb-10">
       <LatarAmbient />
+      <Navbar />
 
       <div className="relative z-10">
         {/* HERO */}
@@ -111,7 +113,7 @@ function LandingPage() {
           </div>
 
           {/* TENTANG */}
-          <Reveal className="mb-16">
+          <Reveal id="tentang" className="mb-16 scroll-mt-24">
             <p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-primary/70">
               Tentang kami
             </p>
@@ -127,7 +129,7 @@ function LandingPage() {
           </Reveal>
 
           {/* MOMEN — carousel, bisa di-slide & diklik buat pop-up */}
-          <Reveal className="mb-16">
+          <Reveal id="momen" className="mb-16 scroll-mt-24">
             <h2 className="mb-1 font-display text-4xl font-black">
               Momen di Sini
             </h2>
@@ -138,7 +140,7 @@ function LandingPage() {
           </Reveal>
 
           {/* FASILITAS — daftar editorial, bukan grid kartu identik */}
-          <Reveal className="mb-16">
+          <Reveal id="fasilitas" className="mb-16 scroll-mt-24">
             <h2 className="mb-6 font-display text-4xl font-black">Fasilitas</h2>
             <div className="divide-y-2 divide-dashed divide-border">
               {FASILITAS.map((f, i) => (
@@ -164,7 +166,7 @@ function LandingPage() {
           </Reveal>
 
           {/* HARGA TIKET — gaya kartu tiket bergerigi */}
-          <Reveal className="mb-16">
+          <Reveal id="harga" className="mb-16 scroll-mt-24">
             <h2 className="mb-6 font-display text-4xl font-black">
               Harga Tiket Masuk
             </h2>
@@ -187,7 +189,7 @@ function LandingPage() {
           </Reveal>
 
           {/* ALAMAT & LOKASI — panel gelap senada hero, kontras premium */}
-          <Reveal className="mb-4">
+          <Reveal id="lokasi" className="mb-4 scroll-mt-24">
             <h2 className="mb-6 font-display text-4xl font-black">Lokasi</h2>
             <div className="panel-kayu rounded-2xl p-6 shadow-lift sm:p-8">
               <p className="font-bold opacity-90">📍 Alamat</p>

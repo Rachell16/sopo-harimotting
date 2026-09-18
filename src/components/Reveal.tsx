@@ -2,7 +2,15 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 // Satu treatment reveal yang konsisten dipakai di semua section landing page
 // (bukan efek beda-beda tiap elemen) — fade + naik sedikit saat discroll ke layar.
-export function Reveal({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function Reveal({
+  children,
+  className = "",
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [tampil, setTampil] = useState(false);
 
@@ -23,7 +31,7 @@ export function Reveal({ children, className = "" }: { children: ReactNode; clas
   }, []);
 
   return (
-    <div ref={ref} className={`reveal ${tampil ? "reveal-tampil" : ""} ${className}`}>
+    <div id={id} ref={ref} className={`reveal ${tampil ? "reveal-tampil" : ""} ${className}`}>
       {children}
     </div>
   );
