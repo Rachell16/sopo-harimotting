@@ -19,10 +19,11 @@ import {
 export const Route = createFileRoute("/kasir")({
   head: () => ({
     meta: [
-      { title: "Beli Tiket — Sopo Harimoting" },
+      { title: "Beli Tiket — Sopo Harimotting" },
       {
         name: "description",
-        content: "Pesan tiket masuk Sopo Harimoting — bayar cash di kasir atau QRIS.",
+        content:
+          "Pesan tiket masuk Sopo Harimotting — bayar cash di kasir atau QRIS.",
       },
     ],
   }),
@@ -81,27 +82,42 @@ function KasirPage() {
   }
 
   const total = HARGA[kategori] * jumlah;
-  const dataDiriLengkap = namaPembeli.trim().length > 1 && waNomor.replace(/\D/g, "").length >= 8;
-  const siapKirim = dataDiriLengkap && (metode === "cash" || (metode === "qris" && !!buktiTf));
+  const dataDiriLengkap =
+    namaPembeli.trim().length > 1 && waNomor.replace(/\D/g, "").length >= 8;
+  const siapKirim =
+    dataDiriLengkap && (metode === "cash" || (metode === "qris" && !!buktiTf));
 
   // ---------- Layar status pesanan (setelah submit) ----------
   if (tiketTampil) {
     if (tiketTampil.status === "disetujui") {
       return (
-        <AppShell title="Tiket Aktif!" subtitle="Tunjukkan QR ini di pintu masuk">
+        <AppShell
+          title="Tiket Aktif!"
+          subtitle="Tunjukkan QR ini di pintu masuk"
+        >
           <div className="kartu-farm overflow-hidden print:shadow-none">
             <div className="bg-primary px-4 py-3 text-center text-primary-foreground">
               <p className="font-display text-2xl font-black">TIKET MASUK</p>
             </div>
             <div className="flex flex-col items-center gap-4 p-5">
               <div className="rounded-2xl border-4 border-wood bg-background p-4">
-                <QRCodeCanvas value={tiketTampil.kode} size={240} level="M" includeMargin={false} />
+                <QRCodeCanvas
+                  value={tiketTampil.kode}
+                  size={240}
+                  level="M"
+                  includeMargin={false}
+                />
               </div>
-              <p className="font-display text-3xl font-black tracking-widest">{tiketTampil.kode}</p>
+              <p className="font-display text-3xl font-black tracking-widest">
+                {tiketTampil.kode}
+              </p>
               <dl className="w-full space-y-2 text-lg">
                 <Baris label="Kategori" nilai={LABEL[tiketTampil.kategori]} />
                 <Baris label="Jumlah" nilai={`${tiketTampil.jumlah} orang`} />
-                <Baris label="Waktu beli" nilai={tanggalJam(tiketTampil.dibuatPada)} />
+                <Baris
+                  label="Waktu beli"
+                  nilai={tanggalJam(tiketTampil.dibuatPada)}
+                />
                 <div className="flex items-center justify-between rounded-xl bg-secondary px-3 py-3">
                   <dt className="text-lg font-bold">Total bayar</dt>
                   <dd className="font-display text-2xl font-black text-primary">
@@ -114,11 +130,12 @@ function KasirPage() {
 
           <div className="mt-5 grid gap-3 print:hidden">
             <p className="text-center text-sm font-bold text-muted-foreground">
-              Takut kelupaan atau tab-nya ke-close? Kirim link tiket ini ke WhatsApp kamu:
+              Takut kelupaan atau tab-nya ke-close? Kirim link tiket ini ke
+              WhatsApp kamu:
             </p>
             <a
               href={`https://wa.me/${formatNomorWa(tiketTampil.waNomor)}?text=${encodeURIComponent(
-                `Halo ${tiketTampil.namaPembeli}, ini tiket masuk Sopo Harimoting kamu: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
+                `Halo ${tiketTampil.namaPembeli}, ini tiket masuk Sopo Harimotting kamu: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -150,15 +167,18 @@ function KasirPage() {
 
     if (tiketTampil.status === "ditolak") {
       return (
-        <AppShell title="Pesanan Ditolak" subtitle="Pembayaran tidak terverifikasi">
+        <AppShell
+          title="Pesanan Ditolak"
+          subtitle="Pembayaran tidak terverifikasi"
+        >
           <div className="kartu-farm p-6 text-center">
             <span className="text-5xl">❌</span>
             <p className="mt-3 font-display text-xl font-black">
               Pesanan {tiketTampil.kode} ditolak petugas
             </p>
             <p className="mt-1 text-muted-foreground">
-              Kemungkinan pembayaran belum diterima atau bukti transfer kurang jelas. Coba pesan
-              ulang atau tanya langsung ke petugas.
+              Kemungkinan pembayaran belum diterima atau bukti transfer kurang
+              jelas. Coba pesan ulang atau tanya langsung ke petugas.
             </p>
           </div>
           <button
@@ -177,13 +197,24 @@ function KasirPage() {
 
     // status === "menunggu"
     return (
-      <AppShell title="Menunggu Konfirmasi" subtitle="Pesanan kamu sedang diverifikasi petugas">
+      <AppShell
+        title="Menunggu Konfirmasi"
+        subtitle="Pesanan kamu sedang diverifikasi petugas"
+      >
         <div className="kartu-farm p-6 text-center">
           <span className="text-5xl">⏳</span>
-          <p className="mt-3 font-display text-2xl font-black tracking-widest">{tiketTampil.kode}</p>
+          <p className="mt-3 font-display text-2xl font-black tracking-widest">
+            {tiketTampil.kode}
+          </p>
           <dl className="mt-4 space-y-2 text-left text-lg">
-            <Baris label="Kategori" nilai={`${LABEL[tiketTampil.kategori]} × ${tiketTampil.jumlah}`} />
-            <Baris label="Metode" nilai={tiketTampil.metode === "qris" ? "QRIS" : "Cash"} />
+            <Baris
+              label="Kategori"
+              nilai={`${LABEL[tiketTampil.kategori]} × ${tiketTampil.jumlah}`}
+            />
+            <Baris
+              label="Metode"
+              nilai={tiketTampil.metode === "qris" ? "QRIS" : "Cash"}
+            />
             <div className="flex items-center justify-between rounded-xl bg-secondary px-3 py-3">
               <dt className="text-lg font-bold">Total</dt>
               <dd className="font-display text-2xl font-black text-primary">
@@ -203,7 +234,7 @@ function KasirPage() {
         </p>
         <a
           href={`https://wa.me/${formatNomorWa(tiketTampil.waNomor)}?text=${encodeURIComponent(
-            `Halo ${tiketTampil.namaPembeli}, pesanan tiket Sopo Harimoting kamu: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
+            `Halo ${tiketTampil.namaPembeli}, pesanan tiket Sopo Harimotting kamu: ${tiketTampil.kode}\n${typeof window !== "undefined" ? window.location.origin : ""}/tiket/${tiketTampil.kode}`,
           )}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -231,14 +262,18 @@ function KasirPage() {
     <AppShell title="Beli Tiket" subtitle="Pesan tiket masuk pengunjung">
       <div className="kartu-farm p-5">
         <p className="mb-3 text-lg font-black">Data Diri</p>
-        <label className="block text-sm font-bold text-muted-foreground">Nama Lengkap</label>
+        <label className="block text-sm font-bold text-muted-foreground">
+          Nama Lengkap
+        </label>
         <input
           value={namaPembeli}
           onChange={(e) => setNamaPembeli(e.target.value)}
           placeholder="Nama kamu"
           className="mt-1 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
         />
-        <label className="mt-3 block text-sm font-bold text-muted-foreground">Nomor WhatsApp</label>
+        <label className="mt-3 block text-sm font-bold text-muted-foreground">
+          Nomor WhatsApp
+        </label>
         <input
           value={waNomor}
           onChange={(e) => setWaNomor(e.target.value.replace(/[^\d+]/g, ""))}
@@ -247,7 +282,8 @@ function KasirPage() {
           className="mt-1 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
         />
         <p className="mt-2 text-xs text-muted-foreground">
-          Dipakai buat kirim link tiket kamu ke WhatsApp & kalau petugas perlu menghubungi.
+          Dipakai buat kirim link tiket kamu ke WhatsApp & kalau petugas perlu
+          menghubungi.
         </p>
       </div>
 
@@ -266,9 +302,15 @@ function KasirPage() {
                     : "border-border bg-background text-foreground"
                 }`}
               >
-                <span className="block text-4xl">{k === "dewasa" ? "🧑‍🌾" : "🧒"}</span>
-                <span className="mt-1 block font-display text-2xl font-black">{LABEL[k]}</span>
-                <span className="block text-base font-bold opacity-90">{rupiah(HARGA[k])}</span>
+                <span className="block text-4xl">
+                  {k === "dewasa" ? "🧑‍🌾" : "🧒"}
+                </span>
+                <span className="mt-1 block font-display text-2xl font-black">
+                  {LABEL[k]}
+                </span>
+                <span className="block text-base font-bold opacity-90">
+                  {rupiah(HARGA[k])}
+                </span>
               </button>
             );
           })}
@@ -287,7 +329,9 @@ function KasirPage() {
             type="number"
             min={1}
             value={jumlah}
-            onChange={(e) => setJumlah(Math.max(1, Number(e.target.value) || 1))}
+            onChange={(e) =>
+              setJumlah(Math.max(1, Number(e.target.value) || 1))
+            }
             className="h-16 w-full rounded-2xl border-4 border-border bg-background text-center font-display text-3xl font-black"
           />
           <button
@@ -301,7 +345,9 @@ function KasirPage() {
 
         <div className="mt-6 flex items-center justify-between rounded-2xl bg-secondary px-4 py-4">
           <span className="text-xl font-black">Total</span>
-          <span className="font-display text-3xl font-black text-primary">{rupiah(total)}</span>
+          <span className="font-display text-3xl font-black text-primary">
+            {rupiah(total)}
+          </span>
         </div>
 
         <p className="mt-6 mb-3 text-lg font-black">Metode Bayar</p>
@@ -333,8 +379,8 @@ function KasirPage() {
 
         {metode === "cash" ? (
           <p className="mt-4 text-sm font-bold text-muted-foreground">
-            Bayar cash langsung ke petugas kasir. Tiket aktif setelah petugas konfirmasi uang
-            diterima.
+            Bayar cash langsung ke petugas kasir. Tiket aktif setelah petugas
+            konfirmasi uang diterima.
           </p>
         ) : null}
 
@@ -366,10 +412,16 @@ function KasirPage() {
               onClick={() => fileRef.current?.click()}
               className="mt-3 w-full rounded-2xl bg-secondary px-4 py-4 text-center font-black text-secondary-foreground"
             >
-              {buktiTf ? "✅ Bukti Transfer Terpilih" : "📁 Upload Bukti Transfer"}
+              {buktiTf
+                ? "✅ Bukti Transfer Terpilih"
+                : "📁 Upload Bukti Transfer"}
             </button>
             {buktiTf ? (
-              <img src={buktiTf} alt="Preview bukti transfer" className="mt-3 max-h-40 w-full rounded-xl object-contain" />
+              <img
+                src={buktiTf}
+                alt="Preview bukti transfer"
+                className="mt-3 max-h-40 w-full rounded-xl object-contain"
+              />
             ) : null}
           </div>
         ) : null}
@@ -377,7 +429,15 @@ function KasirPage() {
 
       <button
         onClick={() =>
-          metode && buatMutation.mutate({ kategori, jumlah, metode, buktiTf, namaPembeli: namaPembeli.trim(), waNomor: formatNomorWa(waNomor) })
+          metode &&
+          buatMutation.mutate({
+            kategori,
+            jumlah,
+            metode,
+            buktiTf,
+            namaPembeli: namaPembeli.trim(),
+            waNomor: formatNomorWa(waNomor),
+          })
         }
         disabled={!metode || !siapKirim || buatMutation.isPending}
         className="mt-5 w-full rounded-2xl bg-accent px-4 py-6 font-display text-2xl font-black text-accent-foreground shadow-lift transition active:translate-y-0.5 disabled:opacity-60"
@@ -400,7 +460,9 @@ function KasirPage() {
       ) : null}
 
       <div className="mt-8 kartu-farm p-4 text-center">
-        <p className="mb-2 text-sm font-bold text-muted-foreground">Udah pernah pesan?</p>
+        <p className="mb-2 text-sm font-bold text-muted-foreground">
+          Udah pernah pesan?
+        </p>
         <div className="flex gap-2">
           <input
             value={cariKode}
@@ -409,7 +471,13 @@ function KasirPage() {
             className="h-12 w-full rounded-xl border-2 border-border bg-background px-3 text-sm font-bold uppercase"
           />
           <button
-            onClick={() => cariKode.trim() && navigate({ to: "/tiket/$kode", params: { kode: cariKode.trim() } })}
+            onClick={() =>
+              cariKode.trim() &&
+              navigate({
+                to: "/tiket/$kode",
+                params: { kode: cariKode.trim() },
+              })
+            }
             disabled={!cariKode.trim()}
             className="h-12 shrink-0 rounded-xl bg-secondary px-4 text-sm font-black text-secondary-foreground disabled:opacity-50"
           >
@@ -419,10 +487,16 @@ function KasirPage() {
       </div>
 
       <div className="mt-6 flex flex-col items-center gap-2 text-center">
-        <Link to="/" className="text-sm font-bold text-muted-foreground underline">
+        <Link
+          to="/"
+          className="text-sm font-bold text-muted-foreground underline"
+        >
           ← Kembali ke beranda
         </Link>
-        <Link to="/login" className="text-sm font-bold text-muted-foreground underline">
+        <Link
+          to="/login"
+          className="text-sm font-bold text-muted-foreground underline"
+        >
           Masuk sebagai petugas/admin/manager →
         </Link>
       </div>

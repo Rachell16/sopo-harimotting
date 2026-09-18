@@ -18,12 +18,17 @@ import {
 
 export const Route = createFileRoute("/admin/stok")({
   head: () => ({
-    meta: [{ title: "Stok Jajanan — Sopo Harimoting" }],
+    meta: [{ title: "Stok Jajanan — Sopo Harimotting" }],
   }),
   component: StokPage,
 });
 
-type BarisImpor = { nama: string; kategori: string; harga: number; stok: number };
+type BarisImpor = {
+  nama: string;
+  kategori: string;
+  harga: number;
+  stok: number;
+};
 
 function StokPage() {
   const queryClient = useQueryClient();
@@ -50,7 +55,9 @@ function StokPage() {
     stok: string;
   } | null>(null);
 
-  const [pratinjauImpor, setPratinjauImpor] = useState<BarisImpor[] | null>(null);
+  const [pratinjauImpor, setPratinjauImpor] = useState<BarisImpor[] | null>(
+    null,
+  );
   const [pesanImporError, setPesanImporError] = useState<string | null>(null);
   const fileImporRef = useRef<HTMLInputElement>(null);
 
@@ -119,7 +126,8 @@ function StokPage() {
         const hasil: BarisImpor[] = rows
           .map((r) => {
             const nama = String(r.Nama ?? r.nama ?? "").trim();
-            const kategori = String(r.Kategori ?? r.kategori ?? "").trim() || "Lainnya";
+            const kategori =
+              String(r.Kategori ?? r.kategori ?? "").trim() || "Lainnya";
             const harga = Number(r.Harga ?? r.harga ?? 0) || 0;
             const stok = Number(r.Stok ?? r.stok ?? 0) || 0;
             return { nama, kategori, harga, stok };
@@ -127,24 +135,29 @@ function StokPage() {
           .filter((r) => r.nama.length > 0);
 
         if (hasil.length === 0) {
-          setPesanImporError('Gak nemu data valid. Pastikan ada kolom "Nama" (wajib), "Kategori", "Harga", "Stok".');
+          setPesanImporError(
+            'Gak nemu data valid. Pastikan ada kolom "Nama" (wajib), "Kategori", "Harga", "Stok".',
+          );
           return;
         }
         setPratinjauImpor(hasil);
       } catch {
-        setPesanImporError("Gagal baca file. Pastikan formatnya .xlsx atau .csv.");
+        setPesanImporError(
+          "Gagal baca file. Pastikan formatnya .xlsx atau .csv.",
+        );
       }
     };
     reader.readAsBinaryString(file);
   }
 
-  const produkDiKategori = (kat: string) => (produk ?? []).filter((p) => p.kategori === kat);
+  const produkDiKategori = (kat: string) =>
+    (produk ?? []).filter((p) => p.kategori === kat);
 
   return (
     <AppShell
       title="Stok Jajanan"
       subtitle={kategoriDipilih ?? "Kelola produk yang dijual di warung"}
-      label="Sopo Harimoting · Admin"
+      label="Sopo Harimotting · Admin"
       menu={MENU_ADMIN}
     >
       {kategoriDipilih === null ? (
@@ -173,7 +186,9 @@ function StokPage() {
           </div>
 
           {pesanImporError ? (
-            <p className="mb-4 kartu-farm p-3 text-center text-sm font-bold text-destructive">{pesanImporError}</p>
+            <p className="mb-4 kartu-farm p-3 text-center text-sm font-bold text-destructive">
+              {pesanImporError}
+            </p>
           ) : null}
 
           {!kategoriList || kategoriList.length === 0 ? (
@@ -189,7 +204,9 @@ function StokPage() {
                   className="kartu-farm p-5 text-left transition active:scale-95 hover:-translate-y-1 hover:shadow-lift"
                 >
                   <p className="font-display text-lg font-black">{kat}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{produkDiKategori(kat).length} produk</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {produkDiKategori(kat).length} produk
+                  </p>
                 </button>
               ))}
             </div>
@@ -208,7 +225,8 @@ function StokPage() {
             {produkDiKategori(kategoriDipilih).length === 0 ? (
               <button
                 onClick={() => {
-                  if (confirm(`Hapus kategori "${kategoriDipilih}"?`)) hapusKategoriMutation.mutate(kategoriDipilih);
+                  if (confirm(`Hapus kategori "${kategoriDipilih}"?`))
+                    hapusKategoriMutation.mutate(kategoriDipilih);
                 }}
                 className="text-sm font-bold text-destructive underline"
               >
@@ -218,7 +236,15 @@ function StokPage() {
           </div>
 
           <button
-            onClick={() => setForm({ kode: null, nama: "", kategori: kategoriDipilih, harga: "", stok: "" })}
+            onClick={() =>
+              setForm({
+                kode: null,
+                nama: "",
+                kategori: kategoriDipilih,
+                harga: "",
+                stok: "",
+              })
+            }
             className="mb-5 w-full rounded-2xl bg-accent px-4 py-4 text-center font-display text-xl font-black text-accent-foreground shadow-lift"
           >
             + Tambah Produk di "{kategoriDipilih}"
@@ -233,15 +259,25 @@ function StokPage() {
               {produkDiKategori(kategoriDipilih).map((p) => (
                 <div key={p.kode} className="flex items-center gap-3 p-4">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-display text-lg font-black">{p.nama}</p>
+                    <p className="truncate font-display text-lg font-black">
+                      {p.nama}
+                    </p>
                     <p className="text-sm font-bold text-muted-foreground">
                       {rupiah(p.harga)} ·{" "}
-                      <span className={p.stok === 0 ? "text-destructive" : ""}>Stok: {p.stok}</span>
+                      <span className={p.stok === 0 ? "text-destructive" : ""}>
+                        Stok: {p.stok}
+                      </span>
                     </p>
                   </div>
                   <button
                     onClick={() =>
-                      setForm({ kode: p.kode, nama: p.nama, kategori: p.kategori, harga: String(p.harga), stok: String(p.stok) })
+                      setForm({
+                        kode: p.kode,
+                        nama: p.nama,
+                        kategori: p.kategori,
+                        harga: String(p.harga),
+                        stok: String(p.stok),
+                      })
                     }
                     className="shrink-0 rounded-xl bg-secondary px-3 py-2 text-sm font-black text-secondary-foreground"
                   >
@@ -249,7 +285,8 @@ function StokPage() {
                   </button>
                   <button
                     onClick={() => {
-                      if (confirm(`Hapus "${p.nama}" dari daftar produk?`)) hapusMutation.mutate(p.kode);
+                      if (confirm(`Hapus "${p.nama}" dari daftar produk?`))
+                        hapusMutation.mutate(p.kode);
                     }}
                     className="shrink-0 rounded-xl bg-destructive/10 px-3 py-2 text-sm font-black text-destructive"
                   >
@@ -288,8 +325,13 @@ function StokPage() {
                 Batal
               </button>
               <button
-                onClick={() => namaKategoriBaru.trim() && tambahKategoriMutation.mutate(namaKategoriBaru.trim())}
-                disabled={!namaKategoriBaru.trim() || tambahKategoriMutation.isPending}
+                onClick={() =>
+                  namaKategoriBaru.trim() &&
+                  tambahKategoriMutation.mutate(namaKategoriBaru.trim())
+                }
+                disabled={
+                  !namaKategoriBaru.trim() || tambahKategoriMutation.isPending
+                }
                 className="flex-1 rounded-xl bg-accent px-4 py-4 font-black text-accent-foreground disabled:opacity-60"
               >
                 {tambahKategoriMutation.isPending ? "..." : "Simpan"}
@@ -313,7 +355,9 @@ function StokPage() {
               {form.kode ? "Edit Produk" : "Tambah Produk"}
             </p>
 
-            <label className="mt-4 block text-sm font-bold text-muted-foreground">Nama produk</label>
+            <label className="mt-4 block text-sm font-bold text-muted-foreground">
+              Nama produk
+            </label>
             <input
               value={form.nama}
               onChange={(e) => setForm({ ...form, nama: e.target.value })}
@@ -322,7 +366,9 @@ function StokPage() {
               autoFocus
             />
 
-            <label className="mt-4 block text-sm font-bold text-muted-foreground">Kategori</label>
+            <label className="mt-4 block text-sm font-bold text-muted-foreground">
+              Kategori
+            </label>
             <input
               value={form.kategori}
               onChange={(e) => setForm({ ...form, kategori: e.target.value })}
@@ -336,19 +382,27 @@ function StokPage() {
               ))}
             </datalist>
 
-            <label className="mt-4 block text-sm font-bold text-muted-foreground">Harga (Rp)</label>
+            <label className="mt-4 block text-sm font-bold text-muted-foreground">
+              Harga (Rp)
+            </label>
             <input
               value={form.harga}
-              onChange={(e) => setForm({ ...form, harga: e.target.value.replace(/\D/g, "") })}
+              onChange={(e) =>
+                setForm({ ...form, harga: e.target.value.replace(/\D/g, "") })
+              }
               inputMode="numeric"
               placeholder="10000"
               className="mt-1 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
             />
 
-            <label className="mt-4 block text-sm font-bold text-muted-foreground">Stok</label>
+            <label className="mt-4 block text-sm font-bold text-muted-foreground">
+              Stok
+            </label>
             <input
               value={form.stok}
-              onChange={(e) => setForm({ ...form, stok: e.target.value.replace(/\D/g, "") })}
+              onChange={(e) =>
+                setForm({ ...form, stok: e.target.value.replace(/\D/g, "") })
+              }
               inputMode="numeric"
               placeholder="20"
               className="mt-1 h-14 w-full rounded-xl border-2 border-border bg-background px-4 text-lg font-bold"
@@ -385,15 +439,24 @@ function StokPage() {
           >
             <p className="font-display text-2xl font-black">Pratinjau Import</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Ketemu <span className="font-black text-foreground">{pratinjauImpor.length} produk</span> di
-              file. Cek dulu sebelum beneran ditambahin.
+              Ketemu{" "}
+              <span className="font-black text-foreground">
+                {pratinjauImpor.length} produk
+              </span>{" "}
+              di file. Cek dulu sebelum beneran ditambahin.
             </p>
 
             <div className="mt-4 max-h-64 space-y-1 overflow-y-auto rounded-xl border-2 border-border p-2">
               {pratinjauImpor.map((r, i) => (
-                <div key={i} className="flex items-center justify-between text-sm">
+                <div
+                  key={i}
+                  className="flex items-center justify-between text-sm"
+                >
                   <span className="truncate font-bold">
-                    {r.nama} <span className="text-muted-foreground">({r.kategori})</span>
+                    {r.nama}{" "}
+                    <span className="text-muted-foreground">
+                      ({r.kategori})
+                    </span>
                   </span>
                   <span className="shrink-0 text-muted-foreground">
                     {rupiah(r.harga)} · stok {r.stok}
@@ -415,7 +478,9 @@ function StokPage() {
                 disabled={importMutation.isPending}
                 className="flex-1 rounded-xl bg-accent px-4 py-4 font-black text-accent-foreground disabled:opacity-60"
               >
-                {importMutation.isPending ? "Mengimpor..." : `Import ${pratinjauImpor.length} Produk`}
+                {importMutation.isPending
+                  ? "Mengimpor..."
+                  : `Import ${pratinjauImpor.length} Produk`}
               </button>
             </div>
           </div>

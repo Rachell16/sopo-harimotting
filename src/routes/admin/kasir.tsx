@@ -6,11 +6,19 @@ import { AppShell } from "@/components/AppShell";
 import { MENU_ADMIN } from "@/lib/admin-menu";
 import { buatTiketAdmin } from "@/lib/tickets.server";
 import { ambilQris } from "@/lib/pengaturan.server";
-import { HARGA, LABEL, rupiah, tanggalJam, type Kategori, type MetodeBayarTiket, type Tiket } from "@/lib/tickets";
+import {
+  HARGA,
+  LABEL,
+  rupiah,
+  tanggalJam,
+  type Kategori,
+  type MetodeBayarTiket,
+  type Tiket,
+} from "@/lib/tickets";
 
 export const Route = createFileRoute("/admin/kasir")({
   head: () => ({
-    meta: [{ title: "Kasir Tiket — Sopo Harimoting" }],
+    meta: [{ title: "Kasir Tiket — Sopo Harimotting" }],
   }),
   component: KasirAdminPage,
 });
@@ -24,11 +32,20 @@ function KasirAdminPage() {
   const [tiket, setTiket] = useState<Tiket | null>(null);
   const [modalQris, setModalQris] = useState(false);
 
-  const { data: qris } = useQuery({ queryKey: ["qris"], queryFn: () => ambilQris(), enabled: modalQris });
+  const { data: qris } = useQuery({
+    queryKey: ["qris"],
+    queryFn: () => ambilQris(),
+    enabled: modalQris,
+  });
 
   const buatMutation = useMutation({
-    mutationFn: (data: { kategori: Kategori; jumlah: number; metode: MetodeBayarTiket; namaPembeli: string; waNomor: string }) =>
-      buatTiketAdmin({ data }),
+    mutationFn: (data: {
+      kategori: Kategori;
+      jumlah: number;
+      metode: MetodeBayarTiket;
+      namaPembeli: string;
+      waNomor: string;
+    }) => buatTiketAdmin({ data }),
     onSuccess: (t) => {
       setTiket(t);
       setModalQris(false);
@@ -40,24 +57,40 @@ function KasirAdminPage() {
 
   if (tiket) {
     return (
-      <AppShell title="Tiket Aktif!" subtitle="Langsung bisa dipakai masuk" label="Sopo Harimoting · Admin" menu={MENU_ADMIN}>
+      <AppShell
+        title="Tiket Aktif!"
+        subtitle="Langsung bisa dipakai masuk"
+        label="Sopo Harimotting · Admin"
+        menu={MENU_ADMIN}
+      >
         <div className="kartu-farm overflow-hidden print:shadow-none">
           <div className="bg-primary px-4 py-3 text-center text-primary-foreground">
             <p className="font-display text-2xl font-black">TIKET MASUK</p>
           </div>
           <div className="flex flex-col items-center gap-4 p-5">
             <div className="rounded-2xl border-4 border-wood bg-background p-4">
-              <QRCodeCanvas value={tiket.kode} size={240} level="M" includeMargin={false} />
+              <QRCodeCanvas
+                value={tiket.kode}
+                size={240}
+                level="M"
+                includeMargin={false}
+              />
             </div>
-            <p className="font-display text-3xl font-black tracking-widest">{tiket.kode}</p>
+            <p className="font-display text-3xl font-black tracking-widest">
+              {tiket.kode}
+            </p>
             <dl className="w-full space-y-2 text-lg">
               <div className="flex items-center justify-between border-b border-dashed border-border pb-2">
                 <dt className="font-bold text-muted-foreground">Kategori</dt>
-                <dd className="font-black">{LABEL[tiket.kategori]} × {tiket.jumlah}</dd>
+                <dd className="font-black">
+                  {LABEL[tiket.kategori]} × {tiket.jumlah}
+                </dd>
               </div>
               <div className="flex items-center justify-between border-b border-dashed border-border pb-2">
                 <dt className="font-bold text-muted-foreground">Metode</dt>
-                <dd className="font-black">{tiket.metode === "qris" ? "QRIS" : "Cash"}</dd>
+                <dd className="font-black">
+                  {tiket.metode === "qris" ? "QRIS" : "Cash"}
+                </dd>
               </div>
               <div className="flex items-center justify-between border-b border-dashed border-border pb-2">
                 <dt className="font-bold text-muted-foreground">Waktu</dt>
@@ -65,7 +98,9 @@ function KasirAdminPage() {
               </div>
               <div className="flex items-center justify-between rounded-xl bg-secondary px-3 py-3">
                 <dt className="text-lg font-bold">Total bayar</dt>
-                <dd className="font-display text-2xl font-black text-primary">{rupiah(tiket.total)}</dd>
+                <dd className="font-display text-2xl font-black text-primary">
+                  {rupiah(tiket.total)}
+                </dd>
               </div>
             </dl>
           </div>
@@ -98,12 +133,12 @@ function KasirAdminPage() {
     <AppShell
       title="Kasir Tiket"
       subtitle="Buat tiket langsung untuk pengunjung di loket"
-      label="Sopo Harimoting · Admin"
+      label="Sopo Harimotting · Admin"
       menu={MENU_ADMIN}
     >
       <p className="kartu-farm mb-5 p-3 text-center text-sm font-bold text-muted-foreground">
-        Buat khusus pengunjung yang beli langsung di loket (gak online). Tiket langsung aktif,
-        gak perlu lewat Verifikasi.
+        Buat khusus pengunjung yang beli langsung di loket (gak online). Tiket
+        langsung aktif, gak perlu lewat Verifikasi.
       </p>
 
       <div className="kartu-farm p-5">
@@ -116,12 +151,20 @@ function KasirAdminPage() {
                 key={k}
                 onClick={() => setKategori(k)}
                 className={`rounded-2xl border-4 px-3 py-5 text-center transition ${
-                  aktif ? "border-primary bg-primary text-primary-foreground shadow-lift" : "border-border bg-background text-foreground"
+                  aktif
+                    ? "border-primary bg-primary text-primary-foreground shadow-lift"
+                    : "border-border bg-background text-foreground"
                 }`}
               >
-                <span className="block text-4xl">{k === "dewasa" ? "🧑‍🌾" : "🧒"}</span>
-                <span className="mt-1 block font-display text-2xl font-black">{LABEL[k]}</span>
-                <span className="block text-base font-bold opacity-90">{rupiah(HARGA[k])}</span>
+                <span className="block text-4xl">
+                  {k === "dewasa" ? "🧑‍🌾" : "🧒"}
+                </span>
+                <span className="mt-1 block font-display text-2xl font-black">
+                  {LABEL[k]}
+                </span>
+                <span className="block text-base font-bold opacity-90">
+                  {rupiah(HARGA[k])}
+                </span>
               </button>
             );
           })}
@@ -139,7 +182,9 @@ function KasirAdminPage() {
             type="number"
             min={1}
             value={jumlah}
-            onChange={(e) => setJumlah(Math.max(1, Number(e.target.value) || 1))}
+            onChange={(e) =>
+              setJumlah(Math.max(1, Number(e.target.value) || 1))
+            }
             className="h-16 w-full rounded-2xl border-4 border-border bg-background text-center font-display text-3xl font-black"
           />
           <button
@@ -152,17 +197,23 @@ function KasirAdminPage() {
 
         <div className="mt-6 flex items-center justify-between rounded-2xl bg-secondary px-4 py-4">
           <span className="text-xl font-black">Total</span>
-          <span className="font-display text-3xl font-black text-primary">{rupiah(total)}</span>
+          <span className="font-display text-3xl font-black text-primary">
+            {rupiah(total)}
+          </span>
         </div>
 
-        <p className="mt-6 mb-1 text-sm font-bold text-muted-foreground">Nama pembeli (opsional)</p>
+        <p className="mt-6 mb-1 text-sm font-bold text-muted-foreground">
+          Nama pembeli (opsional)
+        </p>
         <input
           value={namaPembeli}
           onChange={(e) => setNamaPembeli(e.target.value)}
           placeholder="Kosongkan kalau gak perlu"
           className="h-12 w-full rounded-xl border-2 border-border bg-background px-3 text-base font-bold"
         />
-        <p className="mt-3 mb-1 text-sm font-bold text-muted-foreground">Nomor WA (opsional)</p>
+        <p className="mt-3 mb-1 text-sm font-bold text-muted-foreground">
+          Nomor WA (opsional)
+        </p>
         <input
           value={waNomor}
           onChange={(e) => setWaNomor(e.target.value.replace(/[^\d+]/g, ""))}
@@ -174,7 +225,15 @@ function KasirAdminPage() {
 
       <div className="mt-5 grid grid-cols-2 gap-3">
         <button
-          onClick={() => buatMutation.mutate({ kategori, jumlah, metode: "cash", namaPembeli, waNomor })}
+          onClick={() =>
+            buatMutation.mutate({
+              kategori,
+              jumlah,
+              metode: "cash",
+              namaPembeli,
+              waNomor,
+            })
+          }
           disabled={buatMutation.isPending}
           className="rounded-2xl bg-secondary px-4 py-5 text-center font-display text-xl font-black text-secondary-foreground disabled:opacity-60"
         >
@@ -190,16 +249,21 @@ function KasirAdminPage() {
       </div>
 
       {buatMutation.isError ? (
-        <p className="mt-3 text-center font-bold text-destructive">Gagal membuat tiket. Coba lagi.</p>
+        <p className="mt-3 text-center font-bold text-destructive">
+          Gagal membuat tiket. Coba lagi.
+        </p>
       ) : null}
 
       <p className="mt-4 text-center text-xs text-muted-foreground">
-        Cash langsung bikin tiket. QRIS nunjukin kode dulu, tiket baru dibuat setelah kamu konfirmasi
-        pengunjung udah bayar.
+        Cash langsung bikin tiket. QRIS nunjukin kode dulu, tiket baru dibuat
+        setelah kamu konfirmasi pengunjung udah bayar.
       </p>
 
       <div className="mt-6 text-center">
-        <Link to="/admin/verifikasi" className="text-sm font-bold text-muted-foreground underline">
+        <Link
+          to="/admin/verifikasi"
+          className="text-sm font-bold text-muted-foreground underline"
+        >
           Lihat pesanan online yang menunggu →
         </Link>
       </div>
@@ -214,8 +278,12 @@ function KasirAdminPage() {
             className="w-full max-w-sm rounded-3xl bg-card p-6 text-center shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="font-display text-xl font-black">Scan QRIS untuk Bayar</p>
-            <p className="mt-1 font-display text-2xl font-black text-primary">{rupiah(total)}</p>
+            <p className="font-display text-xl font-black">
+              Scan QRIS untuk Bayar
+            </p>
+            <p className="mt-1 font-display text-2xl font-black text-primary">
+              {rupiah(total)}
+            </p>
 
             {qris ? (
               <img
@@ -246,7 +314,15 @@ function KasirAdminPage() {
                 Batal
               </button>
               <button
-                onClick={() => buatMutation.mutate({ kategori, jumlah, metode: "qris", namaPembeli, waNomor })}
+                onClick={() =>
+                  buatMutation.mutate({
+                    kategori,
+                    jumlah,
+                    metode: "qris",
+                    namaPembeli,
+                    waNomor,
+                  })
+                }
                 disabled={buatMutation.isPending || !qris}
                 className="flex-1 rounded-xl bg-accent px-4 py-4 font-black text-accent-foreground disabled:opacity-60"
               >

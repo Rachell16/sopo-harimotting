@@ -7,14 +7,17 @@ import { ambilQris, hapusQris, simpanQris } from "@/lib/pengaturan.server";
 
 export const Route = createFileRoute("/admin/pengaturan")({
   head: () => ({
-    meta: [{ title: "Pengaturan — Sopo Harimoting" }],
+    meta: [{ title: "Pengaturan — Sopo Harimotting" }],
   }),
   component: PengaturanPage,
 });
 
 function PengaturanPage() {
   const queryClient = useQueryClient();
-  const { data: qris } = useQuery({ queryKey: ["qris"], queryFn: () => ambilQris() });
+  const { data: qris } = useQuery({
+    queryKey: ["qris"],
+    queryFn: () => ambilQris(),
+  });
   const [preview, setPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -44,14 +47,14 @@ function PengaturanPage() {
     <AppShell
       title="Pengaturan"
       subtitle="Kode QRIS untuk pembayaran jajanan"
-      label="Sopo Harimoting · Admin"
+      label="Sopo Harimotting · Admin"
       menu={MENU_ADMIN}
     >
       <div className="kartu-farm p-5">
         <p className="font-display text-xl font-black">Kode QRIS</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Upload foto/scan kode QRIS toko kamu. Ini bakal ditampilkan ke pembeli tiap kali metode
-          bayar "QRIS" dipilih di halaman Jual.
+          Upload foto/scan kode QRIS toko kamu. Ini bakal ditampilkan ke pembeli
+          tiap kali metode bayar "QRIS" dipilih di halaman Jual.
         </p>
 
         <div className="mt-4 flex justify-center">
@@ -96,7 +99,8 @@ function PengaturanPage() {
         {qris && !preview ? (
           <button
             onClick={() => {
-              if (confirm("Hapus QRIS yang ter-upload?")) hapusMutation.mutate();
+              if (confirm("Hapus QRIS yang ter-upload?"))
+                hapusMutation.mutate();
             }}
             className="mt-3 w-full rounded-2xl bg-destructive/10 px-4 py-3 text-center font-black text-destructive"
           >

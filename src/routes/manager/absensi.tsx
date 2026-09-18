@@ -9,7 +9,7 @@ import { ambilKaryawan } from "@/lib/karyawan.server";
 import { jamKerja, kelompokAbsensiPerTanggal } from "@/lib/karyawan";
 
 export const Route = createFileRoute("/manager/absensi")({
-  head: () => ({ meta: [{ title: "Absensi Karyawan — Sopo Harimoting" }] }),
+  head: () => ({ meta: [{ title: "Absensi Karyawan — Sopo Harimotting" }] }),
   component: AbsensiPage,
 });
 
@@ -19,7 +19,10 @@ function AbsensiPage() {
     queryFn: () => ambilAbsensi(),
     refetchInterval: 5000,
   });
-  const { data: karyawan = [] } = useQuery({ queryKey: ["karyawan"], queryFn: () => ambilKaryawan() });
+  const { data: karyawan = [] } = useQuery({
+    queryKey: ["karyawan"],
+    queryFn: () => ambilKaryawan(),
+  });
   const [lihatFoto, setLihatFoto] = useState<string | null>(null);
 
   const namaKaryawan = useMemo(() => {
@@ -34,12 +37,14 @@ function AbsensiPage() {
     <AppShell
       title="Absensi"
       subtitle="Riwayat kehadiran karyawan per tanggal"
-      label="Sopo Harimoting · Manager"
+      label="Sopo Harimotting · Manager"
       menu={MENU_MANAGER}
     >
       {masihDiLokasi.length > 0 ? (
         <div className="mb-5 rounded-2xl bg-success px-4 py-3 text-success-foreground shadow-farm">
-          <p className="font-black">🟢 Masih di lokasi ({masihDiLokasi.length})</p>
+          <p className="font-black">
+            🟢 Masih di lokasi ({masihDiLokasi.length})
+          </p>
           <p className="mt-1 text-sm">
             {masihDiLokasi.map((a) => namaKaryawan(a.karyawanKode)).join(", ")}
           </p>
@@ -54,15 +59,24 @@ function AbsensiPage() {
         <div className="space-y-6">
           {kelompok.map((k) => (
             <div key={k.kunci}>
-              <p className="mb-2 px-1 font-display text-lg font-black">{k.label}</p>
+              <p className="mb-2 px-1 font-display text-lg font-black">
+                {k.label}
+              </p>
               <div className="kartu-farm divide-y-2 divide-dashed divide-border overflow-hidden">
                 {k.list.map((a) => (
                   <div key={a.kode} className="flex items-center gap-3 p-4">
-                    <span className="shrink-0 text-2xl">{a.keluar ? "✅" : "🟢"}</span>
+                    <span className="shrink-0 text-2xl">
+                      {a.keluar ? "✅" : "🟢"}
+                    </span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-display text-lg font-black">{namaKaryawan(a.karyawanKode)}</p>
+                      <p className="truncate font-display text-lg font-black">
+                        {namaKaryawan(a.karyawanKode)}
+                      </p>
                       <p className="text-sm font-bold text-muted-foreground">
-                        Masuk {jam(a.masuk)} {a.keluar ? `· Keluar ${jam(a.keluar)}` : "· masih di lokasi"}
+                        Masuk {jam(a.masuk)}{" "}
+                        {a.keluar
+                          ? `· Keluar ${jam(a.keluar)}`
+                          : "· masih di lokasi"}
                       </p>
                       <div className="mt-1 flex gap-2">
                         {a.fotoMasuk ? (

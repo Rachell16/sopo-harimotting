@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Masuk — Sopo Harimoting" }] }),
+  head: () => ({ meta: [{ title: "Masuk — Sopo Harimotting" }] }),
   component: LoginPage,
 });
 
@@ -10,10 +10,12 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm text-center">
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-primary/70">
-          Sopo Harimoting
+          Sopo Harimotting
         </p>
         <h1 className="mt-1 font-display text-3xl font-black">Masuk Sebagai</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Pilih peran kamu buat lanjut</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Pilih peran kamu buat lanjut
+        </p>
 
         <div className="mt-6 grid gap-4">
           <Link
@@ -23,7 +25,9 @@ function LoginPage() {
             <span className="text-4xl">🔑</span>
             <div>
               <p className="font-display text-xl font-black">Petugas / Admin</p>
-              <p className="text-sm text-muted-foreground">Scan tiket, kasir jajanan, stok, laporan</p>
+              <p className="text-sm text-muted-foreground">
+                Scan tiket, kasir jajanan, stok, laporan
+              </p>
             </div>
           </Link>
 
@@ -34,7 +38,9 @@ function LoginPage() {
             <span className="text-4xl">🗝️</span>
             <div>
               <p className="font-display text-xl font-black">Manager</p>
-              <p className="text-sm text-muted-foreground">Laporan keuangan, absensi, data karyawan</p>
+              <p className="text-sm text-muted-foreground">
+                Laporan keuangan, absensi, data karyawan
+              </p>
             </div>
           </Link>
 
@@ -44,13 +50,20 @@ function LoginPage() {
           >
             <span className="text-4xl">👷</span>
             <div>
-              <p className="font-display text-xl font-black">Petugas / Karyawan</p>
-              <p className="text-sm text-muted-foreground">Login PIN, lihat dashboard & absen pribadi</p>
+              <p className="font-display text-xl font-black">
+                Petugas / Karyawan
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Login PIN, lihat dashboard & absen pribadi
+              </p>
             </div>
           </Link>
         </div>
 
-        <Link to="/" className="mt-6 inline-block text-sm font-bold text-muted-foreground underline">
+        <Link
+          to="/"
+          className="mt-6 inline-block text-sm font-bold text-muted-foreground underline"
+        >
           ← Kembali ke beranda
         </Link>
       </div>

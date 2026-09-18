@@ -5,21 +5,31 @@ import { AppShell } from "@/components/AppShell";
 import { MENU_ADMIN } from "@/lib/admin-menu";
 import { useTiketList } from "@/hooks/useTiket";
 import { validasiTiketServer } from "@/lib/tickets.server";
-import { LABEL, pengunjungMasukHariIni, rupiah, tanggalJam, type HasilScan } from "@/lib/tickets";
+import {
+  LABEL,
+  pengunjungMasukHariIni,
+  rupiah,
+  tanggalJam,
+  type HasilScan,
+} from "@/lib/tickets";
 
 export const Route = createFileRoute("/admin/scan")({
   head: () => ({
     meta: [
-      { title: "Scan Tiket Pintu Masuk — Sopo Harimoting" },
+      { title: "Scan Tiket Pintu Masuk — Sopo Harimotting" },
       {
         name: "description",
         content:
           "Pindai QR code tiket pengunjung di pintu masuk dan lihat hasil validasi secara langsung.",
       },
-      { property: "og:title", content: "Scan Tiket Pintu Masuk — Sopo Harimoting" },
+      {
+        property: "og:title",
+        content: "Scan Tiket Pintu Masuk — Sopo Harimotting",
+      },
       {
         property: "og:description",
-        content: "Validasi tiket pengunjung lewat kamera HP atau tablet petugas.",
+        content:
+          "Validasi tiket pengunjung lewat kamera HP atau tablet petugas.",
       },
     ],
   }),
@@ -34,7 +44,10 @@ function ScanPage() {
   const [memvalidasi, setMemvalidasi] = useState(false);
   const [pesan, setPesan] = useState<string | null>(null);
   const [manual, setManual] = useState("");
-  const scannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null);
+  const scannerRef = useRef<{
+    stop: () => Promise<void>;
+    clear: () => void;
+  } | null>(null);
 
   async function prosesKode(kode: string) {
     setMemvalidasi(true);
@@ -72,7 +85,9 @@ function ScanPage() {
         );
       } catch {
         if (!batal) {
-          setPesan("Kamera tidak bisa dibuka. Gunakan input kode manual di bawah.");
+          setPesan(
+            "Kamera tidak bisa dibuka. Gunakan input kode manual di bawah.",
+          );
           setKameraAktif(false);
         }
       }
@@ -96,7 +111,7 @@ function ScanPage() {
     <AppShell
       title="Pintu Masuk"
       subtitle="Arahkan kamera ke QR tiket pengunjung"
-      label="Sopo Harimoting · Admin"
+      label="Sopo Harimotting · Admin"
       menu={MENU_ADMIN}
     >
       <div className="mb-4 flex items-center justify-between rounded-2xl bg-primary px-4 py-3 text-primary-foreground shadow-farm">
@@ -108,7 +123,9 @@ function ScanPage() {
         <HasilPanel hasil={hasil} onLanjut={() => setHasil(null)} />
       ) : memvalidasi ? (
         <div className="kartu-farm flex min-h-56 items-center justify-center p-6">
-          <p className="text-lg font-bold text-muted-foreground">Memeriksa tiket...</p>
+          <p className="text-lg font-bold text-muted-foreground">
+            Memeriksa tiket...
+          </p>
         </div>
       ) : (
         <div className="kartu-farm p-4">
@@ -134,7 +151,11 @@ function ScanPage() {
             {kameraAktif ? "Hentikan Kamera" : "Buka Kamera & Scan"}
           </button>
 
-          {pesan ? <p className="mt-3 text-center font-bold text-destructive">{pesan}</p> : null}
+          {pesan ? (
+            <p className="mt-3 text-center font-bold text-destructive">
+              {pesan}
+            </p>
+          ) : null}
 
           <div className="mt-6 border-t-2 border-dashed border-border pt-4">
             <p className="mb-2 text-base font-black">Atau ketik kode tiket</p>
@@ -164,7 +185,13 @@ function ScanPage() {
   );
 }
 
-function HasilPanel({ hasil, onLanjut }: { hasil: HasilScan; onLanjut: () => void }) {
+function HasilPanel({
+  hasil,
+  onLanjut,
+}: {
+  hasil: HasilScan;
+  onLanjut: () => void;
+}) {
   const valid = hasil.status === "valid";
   const peringatan = hasil.status === "belum-disetujui";
   const judul =
@@ -189,11 +216,16 @@ function HasilPanel({ hasil, onLanjut }: { hasil: HasilScan; onLanjut: () => voi
               : "bg-destructive text-destructive-foreground"
         }`}
       >
-        <span className="text-7xl">{valid ? "✅" : peringatan ? "⏳" : "⛔"}</span>
-        <p className="mt-3 font-display text-4xl leading-tight font-black">{judul}</p>
+        <span className="text-7xl">
+          {valid ? "✅" : peringatan ? "⏳" : "⛔"}
+        </span>
+        <p className="mt-3 font-display text-4xl leading-tight font-black">
+          {judul}
+        </p>
         {peringatan ? (
           <p className="mt-2 text-base font-bold opacity-90">
-            Cek & setujui dulu di halaman Verifikasi sebelum tiket ini bisa dipakai masuk.
+            Cek & setujui dulu di halaman Verifikasi sebelum tiket ini bisa
+            dipakai masuk.
           </p>
         ) : null}
       </div>
@@ -205,14 +237,21 @@ function HasilPanel({ hasil, onLanjut }: { hasil: HasilScan; onLanjut: () => voi
             <Baris label="Kategori" nilai={LABEL[hasil.tiket.kategori]} />
             <Baris label="Jumlah" nilai={`${hasil.tiket.jumlah} orang`} />
             <Baris label="Harga" nilai={rupiah(hasil.tiket.total)} />
-            <Baris label="Waktu beli" nilai={tanggalJam(hasil.tiket.dibuatPada)} />
+            <Baris
+              label="Waktu beli"
+              nilai={tanggalJam(hasil.tiket.dibuatPada)}
+            />
             {hasil.tiket.dipakaiPada ? (
-              <Baris label="Dipakai" nilai={tanggalJam(hasil.tiket.dipakaiPada)} />
+              <Baris
+                label="Dipakai"
+                nilai={tanggalJam(hasil.tiket.dipakaiPada)}
+              />
             ) : null}
           </dl>
         ) : (
           <p className="text-center font-bold">
-            Kode <span className="font-black">{hasil.kode}</span> tidak terdaftar di sistem.
+            Kode <span className="font-black">{hasil.kode}</span> tidak
+            terdaftar di sistem.
           </p>
         )}
       </div>

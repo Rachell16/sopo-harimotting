@@ -11,10 +11,11 @@ import { useQuery } from "@tanstack/react-query";
 export const Route = createFileRoute("/admin/laporan")({
   head: () => ({
     meta: [
-      { title: "Laporan — Sopo Harimoting" },
+      { title: "Laporan — Sopo Harimotting" },
       {
         name: "description",
-        content: "Riwayat transaksi tiket & jajanan per tanggal, lengkap dengan subtotal harian.",
+        content:
+          "Riwayat transaksi tiket & jajanan per tanggal, lengkap dengan subtotal harian.",
       },
     ],
   }),
@@ -53,26 +54,36 @@ function LaporanPage() {
 
   const tiket = useMemo(() => {
     const disetujui = semuaTiket.filter((t) => t.status === "disetujui");
-    return batasWaktu ? disetujui.filter((t) => new Date(t.dibuatPada) >= batasWaktu) : disetujui;
+    return batasWaktu
+      ? disetujui.filter((t) => new Date(t.dibuatPada) >= batasWaktu)
+      : disetujui;
   }, [semuaTiket, batasWaktu]);
   const jajanan = useMemo(
-    () => (batasWaktu ? semuaJajanan.filter((p) => new Date(p.waktu) >= batasWaktu) : semuaJajanan),
+    () =>
+      batasWaktu
+        ? semuaJajanan.filter((p) => new Date(p.waktu) >= batasWaktu)
+        : semuaJajanan,
     [semuaJajanan, batasWaktu],
   );
 
   const kelompokTiket = useMemo(() => kelompokPerTanggal(tiket), [tiket]);
-  const kelompokJajanan = useMemo(() => kelompokPenjualanPerTanggal(jajanan), [jajanan]);
+  const kelompokJajanan = useMemo(
+    () => kelompokPenjualanPerTanggal(jajanan),
+    [jajanan],
+  );
 
   const totalTiketUang = tiket.reduce((a, t) => a + t.total, 0);
   const totalJajananUang = jajanan.reduce((a, p) => a + p.total, 0);
   const totalGabungan = totalTiketUang + totalJajananUang;
-  const jumlahMenunggu = semuaTiket.filter((t) => t.status === "menunggu").length;
+  const jumlahMenunggu = semuaTiket.filter(
+    (t) => t.status === "menunggu",
+  ).length;
 
   return (
     <AppShell
       title="Laporan"
       subtitle="Riwayat transaksi, tersusun per tanggal"
-      label="Sopo Harimoting · Admin"
+      label="Sopo Harimotting · Admin"
       menu={MENU_ADMIN}
     >
       {jumlahMenunggu > 0 ? (
@@ -90,7 +101,9 @@ function LaporanPage() {
         <p className="text-sm font-bold uppercase tracking-wide opacity-75">
           Total Pendapatan · {FILTER.find((f) => f.id === filter)?.label}
         </p>
-        <p className="mt-1 font-display text-4xl font-black">{rupiah(totalGabungan)}</p>
+        <p className="mt-1 font-display text-4xl font-black">
+          {rupiah(totalGabungan)}
+        </p>
         <div className="mt-2 flex justify-center gap-4 text-sm opacity-85">
           <span>🎟️ Tiket: {rupiah(totalTiketUang)}</span>
           <span>🛍️ Jajanan: {rupiah(totalJajananUang)}</span>
@@ -104,7 +117,9 @@ function LaporanPage() {
             key={f.id}
             onClick={() => setFilter(f.id)}
             className={`flex-1 rounded-xl px-3 py-2.5 text-sm font-black transition ${
-              filter === f.id ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+              filter === f.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
             }`}
           >
             {f.label}
@@ -119,7 +134,9 @@ function LaporanPage() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex-1 pb-3 text-center font-display text-base font-black transition ${
-              tab === t.id ? "border-b-4 border-primary text-primary" : "text-muted-foreground"
+              tab === t.id
+                ? "border-b-4 border-primary text-primary"
+                : "text-muted-foreground"
             }`}
           >
             {t.label}
@@ -147,15 +164,22 @@ function LaporanPage() {
                   <div className="kartu-farm divide-y-2 divide-dashed divide-border overflow-hidden">
                     {k.list.map((t) => (
                       <div key={t.kode} className="flex items-center gap-3 p-4">
-                        <span className="shrink-0 text-2xl">{t.kategori === "dewasa" ? "🧑‍🌾" : "🧒"}</span>
+                        <span className="shrink-0 text-2xl">
+                          {t.kategori === "dewasa" ? "🧑‍🌾" : "🧒"}
+                        </span>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-display text-lg font-black">{t.kode}</p>
+                          <p className="truncate font-display text-lg font-black">
+                            {t.kode}
+                          </p>
                           <p className="text-sm font-bold text-muted-foreground">
-                            {LABEL[t.kategori]} · {t.jumlah} orang · {jam(t.dibuatPada)}
+                            {LABEL[t.kategori]} · {t.jumlah} orang ·{" "}
+                            {jam(t.dibuatPada)}
                           </p>
                         </div>
                         <div className="shrink-0 text-right">
-                          <p className="font-display font-black text-primary">+{rupiah(t.total)}</p>
+                          <p className="font-display font-black text-primary">
+                            +{rupiah(t.total)}
+                          </p>
                           <span
                             className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-black ${
                               t.dipakaiPada
@@ -190,15 +214,22 @@ function LaporanPage() {
                 <div className="kartu-farm divide-y-2 divide-dashed divide-border overflow-hidden">
                   {k.list.map((p) => (
                     <div key={p.kode} className="flex items-center gap-3 p-4">
-                      <span className="shrink-0 text-2xl">{p.metode === "qris" ? "📱" : "💵"}</span>
+                      <span className="shrink-0 text-2xl">
+                        {p.metode === "qris" ? "📱" : "💵"}
+                      </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-display text-lg font-black">{p.kode}</p>
+                        <p className="truncate font-display text-lg font-black">
+                          {p.kode}
+                        </p>
                         <p className="truncate text-sm font-bold text-muted-foreground">
-                          {p.item.map((i) => `${i.nama}×${i.qty}`).join(", ")} · {jam(p.waktu)}
+                          {p.item.map((i) => `${i.nama}×${i.qty}`).join(", ")} ·{" "}
+                          {jam(p.waktu)}
                         </p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <p className="font-display font-black text-primary">+{rupiah(p.total)}</p>
+                        <p className="font-display font-black text-primary">
+                          +{rupiah(p.total)}
+                        </p>
                         <span className="mt-1 inline-block rounded-full bg-secondary px-2.5 py-0.5 text-xs font-black text-secondary-foreground">
                           {p.metode === "qris" ? "QRIS" : "Cash"}
                         </span>

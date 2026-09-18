@@ -6,11 +6,16 @@ import { MENU_ADMIN } from "@/lib/admin-menu";
 import { rupiah } from "@/lib/tickets";
 import { ambilProduk, prosesPenjualan } from "@/lib/warung.server";
 import { ambilQris } from "@/lib/pengaturan.server";
-import { totalKeranjang, type ItemKeranjang, type MetodeBayar, type Penjualan } from "@/lib/warung";
+import {
+  totalKeranjang,
+  type ItemKeranjang,
+  type MetodeBayar,
+  type Penjualan,
+} from "@/lib/warung";
 
 export const Route = createFileRoute("/admin/jual")({
   head: () => ({
-    meta: [{ title: "Kasir Jajanan — Sopo Harimoting" }],
+    meta: [{ title: "Kasir Jajanan — Sopo Harimotting" }],
   }),
   component: JualPage,
 });
@@ -22,7 +27,10 @@ function JualPage() {
     queryFn: () => ambilProduk(),
     refetchInterval: 5000,
   });
-  const { data: qris } = useQuery({ queryKey: ["qris"], queryFn: () => ambilQris() });
+  const { data: qris } = useQuery({
+    queryKey: ["qris"],
+    queryFn: () => ambilQris(),
+  });
 
   const [keranjang, setKeranjang] = useState<ItemKeranjang[]>([]);
   const [struk, setStruk] = useState<Penjualan | null>(null);
@@ -31,7 +39,8 @@ function JualPage() {
   const [kategoriDipilih, setKategoriDipilih] = useState<string | null>(null);
 
   const bayarMutation = useMutation({
-    mutationFn: (metode: MetodeBayar) => prosesPenjualan({ data: { keranjang, metode } }),
+    mutationFn: (metode: MetodeBayar) =>
+      prosesPenjualan({ data: { keranjang, metode } }),
     onSuccess: (hasil) => {
       setStruk(hasil);
       setKeranjang([]);
@@ -45,33 +54,53 @@ function JualPage() {
     },
   });
 
-  function tambah(p: { kode: string; nama: string; harga: number; stok: number }) {
+  function tambah(p: {
+    kode: string;
+    nama: string;
+    harga: number;
+    stok: number;
+  }) {
     setKeranjang((list) => {
       const ada = list.find((i) => i.kode === p.kode);
       const qtySekarang = ada?.qty ?? 0;
       if (qtySekarang >= p.stok) return list;
-      if (ada) return list.map((i) => (i.kode === p.kode ? { ...i, qty: i.qty + 1 } : i));
+      if (ada)
+        return list.map((i) =>
+          i.kode === p.kode ? { ...i, qty: i.qty + 1 } : i,
+        );
       return [...list, { kode: p.kode, nama: p.nama, harga: p.harga, qty: 1 }];
     });
   }
 
   function kurang(kode: string) {
     setKeranjang((list) =>
-      list.flatMap((i) => (i.kode === kode ? (i.qty > 1 ? [{ ...i, qty: i.qty - 1 }] : []) : [i])),
+      list.flatMap((i) =>
+        i.kode === kode ? (i.qty > 1 ? [{ ...i, qty: i.qty - 1 }] : []) : [i],
+      ),
     );
   }
 
   if (struk) {
     return (
-      <AppShell title="Transaksi Berhasil" subtitle="Struk penjualan" label="Sopo Harimoting · Admin" menu={MENU_ADMIN}>
+      <AppShell
+        title="Transaksi Berhasil"
+        subtitle="Struk penjualan"
+        label="Sopo Harimotting · Admin"
+        menu={MENU_ADMIN}
+      >
         <div className="kartu-tiket p-6">
-          <p className="text-center font-display text-2xl font-black">🧾 {struk.kode}</p>
+          <p className="text-center font-display text-2xl font-black">
+            🧾 {struk.kode}
+          </p>
           <p className="text-center text-sm font-bold text-muted-foreground">
             Dibayar via {struk.metode === "qris" ? "QRIS 📱" : "Cash 💵"}
           </p>
           <div className="my-4 divide-y-2 divide-dashed divide-border">
             {struk.item.map((i) => (
-              <div key={i.kode} className="flex justify-between py-2 text-sm font-bold">
+              <div
+                key={i.kode}
+                className="flex justify-between py-2 text-sm font-bold"
+              >
                 <span>
                   {i.nama} × {i.qty}
                 </span>
@@ -81,7 +110,9 @@ function JualPage() {
           </div>
           <div className="flex justify-between border-t-2 border-border pt-3">
             <span className="font-display text-lg font-black">Total</span>
-            <span className="font-display text-2xl font-black text-primary">{rupiah(struk.total)}</span>
+            <span className="font-display text-2xl font-black text-primary">
+              {rupiah(struk.total)}
+            </span>
           </div>
         </div>
         <button
@@ -98,7 +129,12 @@ function JualPage() {
   }
 
   return (
-    <AppShell title="Kasir Jajanan" subtitle="Pilih barang yang dibeli" label="Sopo Harimoting · Admin" menu={MENU_ADMIN}>
+    <AppShell
+      title="Kasir Jajanan"
+      subtitle="Pilih barang yang dibeli"
+      label="Sopo Harimotting · Admin"
+      menu={MENU_ADMIN}
+    >
       {!produk || produk.length === 0 ? (
         <p className="kartu-farm p-6 text-center text-lg font-bold text-muted-foreground">
           Belum ada produk.{" "}
@@ -113,7 +149,9 @@ function JualPage() {
           {Array.from(new Set(produk.map((p) => p.kategori)))
             .sort()
             .map((kat) => {
-              const jumlahProduk = produk.filter((p) => p.kategori === kat).length;
+              const jumlahProduk = produk.filter(
+                (p) => p.kategori === kat,
+              ).length;
               return (
                 <button
                   key={kat}
@@ -121,7 +159,9 @@ function JualPage() {
                   className="kartu-farm p-5 text-left transition active:scale-95 hover:-translate-y-1 hover:shadow-lift"
                 >
                   <p className="font-display text-lg font-black">{kat}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{jumlahProduk} produk</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {jumlahProduk} produk
+                  </p>
                 </button>
               );
             })}
@@ -135,12 +175,15 @@ function JualPage() {
           >
             ← Ganti kategori
           </button>
-          <p className="mb-3 font-display text-xl font-black">{kategoriDipilih}</p>
+          <p className="mb-3 font-display text-xl font-black">
+            {kategoriDipilih}
+          </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {produk
               .filter((p) => p.kategori === kategoriDipilih)
               .map((p) => {
-                const diKeranjang = keranjang.find((i) => i.kode === p.kode)?.qty ?? 0;
+                const diKeranjang =
+                  keranjang.find((i) => i.kode === p.kode)?.qty ?? 0;
                 const habis = p.stok === 0 || diKeranjang >= p.stok;
                 return (
                   <button
@@ -154,10 +197,16 @@ function JualPage() {
                         {diKeranjang}
                       </span>
                     ) : null}
-                    <p className="font-display text-base font-black">{p.nama}</p>
-                    <p className="mt-1 text-sm font-bold text-primary">{rupiah(p.harga)}</p>
+                    <p className="font-display text-base font-black">
+                      {p.nama}
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-primary">
+                      {rupiah(p.harga)}
+                    </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {habis && p.stok === 0 ? "Stok habis" : `Stok: ${p.stok - diKeranjang}`}
+                      {habis && p.stok === 0
+                        ? "Stok habis"
+                        : `Stok: ${p.stok - diKeranjang}`}
                     </p>
                   </button>
                 );
@@ -172,7 +221,10 @@ function JualPage() {
           <div className="mx-auto max-w-3xl">
             <div className="mb-3 max-h-28 space-y-1 overflow-y-auto">
               {keranjang.map((i) => (
-                <div key={i.kode} className="flex items-center justify-between text-sm font-bold">
+                <div
+                  key={i.kode}
+                  className="flex items-center justify-between text-sm font-bold"
+                >
                   <span className="truncate">
                     {i.nama} × {i.qty}
                   </span>
@@ -188,10 +240,14 @@ function JualPage() {
                 </div>
               ))}
             </div>
-            {pesan ? <p className="mb-2 text-sm font-bold text-destructive">{pesan}</p> : null}
+            {pesan ? (
+              <p className="mb-2 text-sm font-bold text-destructive">{pesan}</p>
+            ) : null}
 
             <div className="mb-2 flex items-center justify-between">
-              <span className="font-display text-sm font-bold text-muted-foreground">Total</span>
+              <span className="font-display text-sm font-bold text-muted-foreground">
+                Total
+              </span>
               <span className="font-display text-2xl font-black text-primary">
                 {rupiah(totalKeranjang(keranjang))}
               </span>
@@ -227,7 +283,9 @@ function JualPage() {
             className="w-full max-w-sm rounded-3xl bg-card p-6 text-center shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="font-display text-xl font-black">Scan QRIS untuk Bayar</p>
+            <p className="font-display text-xl font-black">
+              Scan QRIS untuk Bayar
+            </p>
             <p className="mt-1 font-display text-2xl font-black text-primary">
               {rupiah(totalKeranjang(keranjang))}
             </p>
