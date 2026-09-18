@@ -185,7 +185,7 @@ function LandingPage() {
             <div className="mx-auto grid max-w-md grid-cols-2 gap-6">
               <div className="kartu-tiket p-5 text-center transition hover:-translate-y-1">
                 <img
-                  src="/icon/dewasa.jpg"
+                  src="/icon/dewasa.png"
                   className="h-9 w-9 object-cover rounded-full"
                 />
                 <p className="mt-1 font-display text-lg font-black">Dewasa</p>
@@ -195,7 +195,7 @@ function LandingPage() {
               </div>
               <div className="kartu-tiket p-5 text-center transition hover:-translate-y-1">
                 <img
-                  src="/icon/anak.jpg"
+                  src="/icon/anak.png"
                   className="h-9 w-9 object-cover rounded-full"
                 />
                 <p className="mt-1 font-display text-lg font-black">Anak</p>
