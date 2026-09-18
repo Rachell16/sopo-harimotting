@@ -44,10 +44,14 @@ export function AppShell({
                 key={m.to}
                 to={m.to}
                 activeOptions={{ exact: m.to === "/" }}
-                className="flex flex-col items-center gap-1 py-3 text-base font-bold text-muted-foreground"
+                className={`flex flex-col items-center gap-0.5 text-center font-bold text-muted-foreground ${
+                  menu.length > 4 ? "px-0.5 py-2 text-[11px] leading-tight" : "py-3 text-base"
+                }`}
                 activeProps={{ className: "!text-primary bg-secondary/70" }}
               >
-                <span className="text-2xl leading-none">{m.icon}</span>
+                <span className={menu.length > 4 ? "text-xl leading-none" : "text-2xl leading-none"}>
+                  {m.icon}
+                </span>
                 {m.label}
               </Link>
             ))}

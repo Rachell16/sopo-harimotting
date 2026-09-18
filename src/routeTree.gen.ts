@@ -17,6 +17,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ManagerRouteRouteImport } from './routes/manager/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminJualRouteImport } from './routes/admin/jual'
+import { Route as AdminKasirRouteImport } from './routes/admin/kasir'
 import { Route as AdminLaporanRouteImport } from './routes/admin/laporan'
 import { Route as AdminPengaturanRouteImport } from './routes/admin/pengaturan'
 import { Route as AdminScanRouteImport } from './routes/admin/scan'
@@ -67,6 +68,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminJualRoute = AdminJualRouteImport.update({
   id: '/jual',
   path: '/jual',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminKasirRoute = AdminKasirRouteImport.update({
+  id: '/kasir',
+  path: '/kasir',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminLaporanRoute = AdminLaporanRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/kasir': typeof KasirRoute
   '/login': typeof LoginRoute
   '/admin/jual': typeof AdminJualRoute
+  '/admin/kasir': typeof AdminKasirRoute
   '/admin/laporan': typeof AdminLaporanRoute
   '/admin/pengaturan': typeof AdminPengaturanRoute
   '/admin/scan': typeof AdminScanRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/kasir': typeof KasirRoute
   '/login': typeof LoginRoute
   '/admin/jual': typeof AdminJualRoute
+  '/admin/kasir': typeof AdminKasirRoute
   '/admin/laporan': typeof AdminLaporanRoute
   '/admin/pengaturan': typeof AdminPengaturanRoute
   '/admin/scan': typeof AdminScanRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/kasir': typeof KasirRoute
   '/login': typeof LoginRoute
   '/admin/jual': typeof AdminJualRoute
+  '/admin/kasir': typeof AdminKasirRoute
   '/admin/laporan': typeof AdminLaporanRoute
   '/admin/pengaturan': typeof AdminPengaturanRoute
   '/admin/scan': typeof AdminScanRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/kasir'
     | '/login'
     | '/admin/jual'
+    | '/admin/kasir'
     | '/admin/laporan'
     | '/admin/pengaturan'
     | '/admin/scan'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/kasir'
     | '/login'
     | '/admin/jual'
+    | '/admin/kasir'
     | '/admin/laporan'
     | '/admin/pengaturan'
     | '/admin/scan'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/kasir'
     | '/login'
     | '/admin/jual'
+    | '/admin/kasir'
     | '/admin/laporan'
     | '/admin/pengaturan'
     | '/admin/scan'
@@ -315,6 +327,13 @@ declare module '@tanstack/react-router' {
       path: '/jual'
       fullPath: '/admin/jual'
       preLoaderRoute: typeof AdminJualRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/kasir': {
+      id: '/admin/kasir'
+      path: '/kasir'
+      fullPath: '/admin/kasir'
+      preLoaderRoute: typeof AdminKasirRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/laporan': {
@@ -399,6 +418,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteRouteChildren {
   AdminJualRoute: typeof AdminJualRoute
+  AdminKasirRoute: typeof AdminKasirRoute
   AdminLaporanRoute: typeof AdminLaporanRoute
   AdminPengaturanRoute: typeof AdminPengaturanRoute
   AdminScanRoute: typeof AdminScanRoute
@@ -409,6 +429,7 @@ interface AdminRouteRouteChildren {
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminJualRoute: AdminJualRoute,
+  AdminKasirRoute: AdminKasirRoute,
   AdminLaporanRoute: AdminLaporanRoute,
   AdminPengaturanRoute: AdminPengaturanRoute,
   AdminScanRoute: AdminScanRoute,

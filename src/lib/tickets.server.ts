@@ -109,7 +109,59 @@ export const buatTiketServer = createServerFn({ method: "POST" })
     throw new Error("Gagal membuat kode tiket unik, coba lagi.");
   });
 
-// Ambil pesanan yang masih menunggu approval petugas.
+// Petugas bikin tiket LANGSUNG di loket buat pengunjung yang gak beli online
+// (gak punya HP / males ribet) — statusnya langsung 'disetujui', gak perlu
+// masuk antrian Verifikasi lagi karena petugas sendiri yang nerima uangnya.
+export const buatTiketAdmin = createServerFn({ method: "POST" })
+  .validator(
+    (data: {
+      kategori: Kategori;
+      jumlah: number;
+      metode: MetodeBayarTiket;
+      namaPembeli?: string;
+      waNomor?: string;
+    }) => data,
+  )
+  .handler(async ({ data }): Promise<Tiket> => {
+    const total = HARGA[data.kategori] * data.jumlah;
+    const namaPembeli = data.namaPembeli?.trim() || "";
+    const waNomor = data.waNomor?.trim() || "";
+
+    if (MODE_DEMO) {
+      const tiket: Tiket = {
+        kode: kodeAcak(),
+        kategori: data.kategori,
+        jumlah: data.jumlah,
+        total,
+        metode: data.metode,
+        status: "disetujui",
+        buktiTf: null,
+        namaPembeli,
+        waNomor,
+        dibuatPada: new Date().toISOString(),
+        dipakaiPada: null,
+      };
+      tiketDemo.unshift(tiket);
+      return tiket;
+    }
+
+    await pastikanSkema();
+    for (let percobaan = 0; percobaan < 5; percobaan++) {
+      const kode = kodeAcak();
+      try {
+        const rows = (await sql`
+          INSERT INTO tiket (kode, kategori, jumlah, total, metode, status, bukti_tf, nama_pembeli, wa_nomor)
+          VALUES (${kode}, ${data.kategori}, ${data.jumlah}, ${total}, ${data.metode}, 'disetujui', NULL, ${namaPembeli}, ${waNomor})
+          RETURNING *
+        `) as BarisTiket[];
+        return barisKeTiket(rows[0]!);
+      } catch (err: any) {
+        if (err?.code === "23505") continue;
+        throw err;
+      }
+    }
+    throw new Error("Gagal membuat kode tiket unik, coba lagi.");
+  });
 export const ambilTiketMenunggu = createServerFn({ method: "GET" }).handler(async (): Promise<Tiket[]> => {
   if (MODE_DEMO) return tiketDemo.filter((t) => t.status === "menunggu");
 
