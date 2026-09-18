@@ -130,8 +130,12 @@ export function HeroScene() {
       {/* Vignette */}
       <div className="pointer-events-none absolute inset-0 shadow-[inset_0_0_120px_60px_oklch(0.1_0.03_50_/_0.35)]" />
 
-      {/* Isyarat scroll */}
-      <div className="hero-anim-cuit absolute bottom-6 left-1/2 -translate-x-1/2 text-cream/70">
+      {/* Isyarat scroll — bisa diklik/dipencet, langsung lompat ke section berikutnya */}
+      <a
+        href="#tentang"
+        aria-label="Scroll ke bawah"
+        className="hero-anim-cuit absolute bottom-6 left-1/2 flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full text-cream/80 transition hover:bg-cream/10 hover:text-cream active:scale-90"
+      >
         <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
           <path
             d="M1 1L11 12L21 1"
@@ -141,7 +145,7 @@ export function HeroScene() {
             strokeLinejoin="round"
           />
         </svg>
-      </div>
+      </a>
 
     </div>
   );
