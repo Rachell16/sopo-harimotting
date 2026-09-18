@@ -6,6 +6,7 @@ import type { ItemKeranjang, MetodeBayar, Penjualan, Produk } from "./warung";
 type BarisProduk = {
   kode: string;
   nama: string;
+  kategori: string;
   harga: number;
   stok: number;
   dibuat_pada: string;
@@ -23,6 +24,7 @@ function barisKeProduk(r: BarisProduk): Produk {
   return {
     kode: r.kode,
     nama: r.nama,
+    kategori: r.kategori,
     harga: r.harga,
     stok: r.stok,
     dibuatPada: new Date(r.dibuat_pada).toISOString(),
@@ -55,12 +57,15 @@ export const ambilProduk = createServerFn({ method: "GET" }).handler(async (): P
 });
 
 export const buatProduk = createServerFn({ method: "POST" })
-  .validator((data: { nama: string; harga: number; stok: number }) => data)
+  .validator((data: { nama: string; kategori: string; harga: number; stok: number }) => data)
   .handler(async ({ data }): Promise<Produk> => {
+    const kategori = data.kategori.trim() || "Lainnya";
+
     if (MODE_DEMO) {
       const produk: Produk = {
         kode: buatKode("PRD"),
         nama: data.nama,
+        kategori,
         harga: data.harga,
         stok: data.stok,
         dibuatPada: new Date().toISOString(),
@@ -74,8 +79,8 @@ export const buatProduk = createServerFn({ method: "POST" })
       const kode = buatKode("PRD");
       try {
         const rows = (await sql`
-          INSERT INTO produk (kode, nama, harga, stok)
-          VALUES (${kode}, ${data.nama}, ${data.harga}, ${data.stok})
+          INSERT INTO produk (kode, nama, kategori, harga, stok)
+          VALUES (${kode}, ${data.nama}, ${kategori}, ${data.harga}, ${data.stok})
           RETURNING *
         `) as BarisProduk[];
         return barisKeProduk(rows[0]!);
@@ -88,18 +93,20 @@ export const buatProduk = createServerFn({ method: "POST" })
   });
 
 export const updateProduk = createServerFn({ method: "POST" })
-  .validator((data: { kode: string; nama: string; harga: number; stok: number }) => data)
+  .validator((data: { kode: string; nama: string; kategori: string; harga: number; stok: number }) => data)
   .handler(async ({ data }): Promise<Produk> => {
+    const kategori = data.kategori.trim() || "Lainnya";
+
     if (MODE_DEMO) {
       const idx = produkDemo.findIndex((p) => p.kode === data.kode);
       if (idx === -1) throw new Error("Produk tidak ditemukan");
-      produkDemo[idx] = { ...produkDemo[idx]!, nama: data.nama, harga: data.harga, stok: data.stok };
+      produkDemo[idx] = { ...produkDemo[idx]!, nama: data.nama, kategori, harga: data.harga, stok: data.stok };
       return produkDemo[idx]!;
     }
 
     await pastikanSkema();
     const rows = (await sql`
-      UPDATE produk SET nama = ${data.nama}, harga = ${data.harga}, stok = ${data.stok}
+      UPDATE produk SET nama = ${data.nama}, kategori = ${kategori}, harga = ${data.harga}, stok = ${data.stok}
       WHERE kode = ${data.kode}
       RETURNING *
     `) as BarisProduk[];
@@ -119,6 +126,46 @@ export const hapusProduk = createServerFn({ method: "POST" })
     await pastikanSkema();
     await sql`DELETE FROM produk WHERE kode = ${kode}`;
     return { ok: true };
+  });
+
+// Import banyak produk sekaligus dari Excel/CSV — dipakai tombol "Import Excel"
+// di halaman Stok. Produk baru ditambahkan, gak menimpa yang udah ada.
+export const importProdukMassal = createServerFn({ method: "POST" })
+  .validator((items: { nama: string; kategori: string; harga: number; stok: number }[]) => items)
+  .handler(async ({ data: items }): Promise<{ jumlah: number }> => {
+    const valid = items.filter((i) => i.nama.trim().length > 0);
+
+    if (MODE_DEMO) {
+      for (const item of valid) {
+        produkDemo.push({
+          kode: buatKode("PRD"),
+          nama: item.nama.trim(),
+          kategori: item.kategori.trim() || "Lainnya",
+          harga: item.harga || 0,
+          stok: item.stok || 0,
+          dibuatPada: new Date().toISOString(),
+        });
+      }
+      return { jumlah: valid.length };
+    }
+
+    await pastikanSkema();
+    for (const item of valid) {
+      for (let percobaan = 0; percobaan < 5; percobaan++) {
+        const kode = buatKode("PRD");
+        try {
+          await sql`
+            INSERT INTO produk (kode, nama, kategori, harga, stok)
+            VALUES (${kode}, ${item.nama.trim()}, ${item.kategori.trim() || "Lainnya"}, ${item.harga || 0}, ${item.stok || 0})
+          `;
+          break;
+        } catch (err: any) {
+          if (err?.code === "23505") continue;
+          throw err;
+        }
+      }
+    }
+    return { jumlah: valid.length };
   });
 
 // ---------- Penjualan (kasir jajanan) ----------

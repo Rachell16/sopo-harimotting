@@ -5,6 +5,7 @@ export type MetodeBayar = "cash" | "qris";
 export type Produk = {
   kode: string;
   nama: string;
+  kategori: string;
   harga: number;
   stok: number;
   dibuatPada: string;

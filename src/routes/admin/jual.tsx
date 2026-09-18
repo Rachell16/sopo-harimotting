@@ -28,6 +28,7 @@ function JualPage() {
   const [struk, setStruk] = useState<Penjualan | null>(null);
   const [pesan, setPesan] = useState<string | null>(null);
   const [modalQris, setModalQris] = useState(false);
+  const [kategoriDipilih, setKategoriDipilih] = useState<string | null>(null);
 
   const bayarMutation = useMutation({
     mutationFn: (metode: MetodeBayar) => prosesPenjualan({ data: { keranjang, metode } }),
@@ -84,7 +85,10 @@ function JualPage() {
           </div>
         </div>
         <button
-          onClick={() => setStruk(null)}
+          onClick={() => {
+            setStruk(null);
+            setKategoriDipilih(null);
+          }}
           className="mt-5 w-full rounded-2xl bg-accent px-4 py-5 text-center font-display text-xl font-black text-accent-foreground shadow-lift"
         >
           ➕ Transaksi Baru
@@ -103,31 +107,62 @@ function JualPage() {
           </Link>
           .
         </p>
+      ) : kategoriDipilih === null ? (
+        // ---------- Langkah 1: pilih kategori ----------
+        <div className="grid grid-cols-2 gap-3">
+          {Array.from(new Set(produk.map((p) => p.kategori)))
+            .sort()
+            .map((kat) => {
+              const jumlahProduk = produk.filter((p) => p.kategori === kat).length;
+              return (
+                <button
+                  key={kat}
+                  onClick={() => setKategoriDipilih(kat)}
+                  className="kartu-farm p-5 text-left transition active:scale-95 hover:-translate-y-1 hover:shadow-lift"
+                >
+                  <p className="font-display text-lg font-black">{kat}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{jumlahProduk} produk</p>
+                </button>
+              );
+            })}
+        </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {produk.map((p) => {
-            const diKeranjang = keranjang.find((i) => i.kode === p.kode)?.qty ?? 0;
-            const habis = p.stok === 0 || diKeranjang >= p.stok;
-            return (
-              <button
-                key={p.kode}
-                onClick={() => tambah(p)}
-                disabled={habis}
-                className="kartu-farm relative p-4 text-left transition active:scale-95 disabled:opacity-40"
-              >
-                {diKeranjang > 0 ? (
-                  <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-accent font-black text-accent-foreground shadow">
-                    {diKeranjang}
-                  </span>
-                ) : null}
-                <p className="font-display text-base font-black">{p.nama}</p>
-                <p className="mt-1 text-sm font-bold text-primary">{rupiah(p.harga)}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {habis && p.stok === 0 ? "Stok habis" : `Stok: ${p.stok - diKeranjang}`}
-                </p>
-              </button>
-            );
-          })}
+        // ---------- Langkah 2: pilih produk dalam kategori ----------
+        <div>
+          <button
+            onClick={() => setKategoriDipilih(null)}
+            className="mb-4 text-sm font-bold text-muted-foreground underline"
+          >
+            ← Ganti kategori
+          </button>
+          <p className="mb-3 font-display text-xl font-black">{kategoriDipilih}</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {produk
+              .filter((p) => p.kategori === kategoriDipilih)
+              .map((p) => {
+                const diKeranjang = keranjang.find((i) => i.kode === p.kode)?.qty ?? 0;
+                const habis = p.stok === 0 || diKeranjang >= p.stok;
+                return (
+                  <button
+                    key={p.kode}
+                    onClick={() => tambah(p)}
+                    disabled={habis}
+                    className="kartu-farm relative p-4 text-left transition active:scale-95 disabled:opacity-40"
+                  >
+                    {diKeranjang > 0 ? (
+                      <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-accent font-black text-accent-foreground shadow">
+                        {diKeranjang}
+                      </span>
+                    ) : null}
+                    <p className="font-display text-base font-black">{p.nama}</p>
+                    <p className="mt-1 text-sm font-bold text-primary">{rupiah(p.harga)}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {habis && p.stok === 0 ? "Stok habis" : `Stok: ${p.stok - diKeranjang}`}
+                    </p>
+                  </button>
+                );
+              })}
+          </div>
         </div>
       )}
 
