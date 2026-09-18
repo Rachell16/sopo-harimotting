@@ -31,7 +31,9 @@ export function Navbar() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
         <a href="#" className="flex items-center gap-2 text-cream">
-          <span className="text-2xl">🐴</span>
+          <div className="hero-anim-zoom absolute inset-0">
+            <img src="/image.png" className="h-full w-full object-cover" />
+          </div>
           <span className="font-display text-lg font-black tracking-tight sm:text-xl">
             Sopo Harimotting
           </span>
