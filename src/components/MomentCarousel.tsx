@@ -2,10 +2,28 @@ import { useEffect, useRef, useState } from "react";
 import { MomentIllustration } from "./MomentIllustration";
 
 export type SlideMomen = {
-  variasi: "kuda" | "kelinci" | "gazebo" | "warung";
+  // Nama bebas (dipakai buat cari ilustrasi yang cocok di MomentIllustration.tsx,
+  // "kuda" | "kelinci" | "gazebo" | "warung" udah ada gambarnya. Nama lain otomatis
+  // pakai ilustrasi generik sampai foto asli diisi lewat `foto`).
+  variasi: string;
   judul: string;
   teks: string;
+  // Opsional — kalau diisi, foto asli ini yang ditampilin (bukan ilustrasi SVG).
+  // Taruh file foto-nya di folder public/images/, terus isi path-nya di sini,
+  // contoh: foto: "/images/kolam-ikan.jpg"
+  foto?: string;
 };
+
+// ============================================================================
+// CARA NAMBAH AREA/MOMEN BARU DI CAROUSEL INI:
+// Buka src/routes/index.tsx, cari array `MOMEN`, tambahin object baru persis
+// kayak yang udah ada, contoh:
+//
+//   { variasi: "kolam-ikan", judul: "Kolam Ikan", teks: "Deskripsi singkatnya di sini." }
+//
+// Itu aja — carousel, titik indikator, sama nomor slide di bawah semua
+// otomatis nyesuain jumlah slide, gak perlu ubah apa-apa di file ini.
+// ============================================================================
 
 export function MomentCarousel({ slide }: { slide: SlideMomen[] }) {
   const [aktif, setAktif] = useState(0);
@@ -25,8 +43,8 @@ export function MomentCarousel({ slide }: { slide: SlideMomen[] }) {
 
   return (
     <>
-      <div className="relative">
-        <div className="overflow-hidden rounded-2xl">
+      <div className="relative overflow-hidden rounded-3xl border-4 border-wood shadow-lift">
+        <div className="overflow-hidden">
           <div
             className="flex transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
             style={{ transform: `translateX(-${aktif * 100}%)` }}
@@ -39,51 +57,58 @@ export function MomentCarousel({ slide }: { slide: SlideMomen[] }) {
                 aria-label={`Lihat lebih besar: ${m.judul}`}
               >
                 <div className="relative">
-                  <MomentIllustration variasi={m.variasi} />
-                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/55 via-transparent to-transparent p-5">
+                  <MomentIllustration variasi={m.variasi} foto={m.foto} />
+                  <div className="absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/70 via-black/10 to-black/30 p-5">
+                    {/* Nomor slide, gaya "01 / 03" kayak carousel destinasi situs wisata besar */}
+                    <div className="flex justify-between">
+                      <span className="rounded-full bg-cream/90 px-3 py-1 font-display text-sm font-black text-wood-dark shadow">
+                        {String(i + 1).padStart(2, "0")} / {String(slide.length).padStart(2, "0")}
+                      </span>
+                      <span className="rounded-full bg-cream/90 px-3 py-1 text-xs font-bold text-wood-dark shadow">
+                        🔍 Perbesar
+                      </span>
+                    </div>
+
                     <div className="text-cream">
-                      <p className="font-display text-2xl font-black drop-shadow">{m.judul}</p>
-                      <p className="mt-1 text-sm opacity-90">{m.teks}</p>
+                      <p className="font-display text-2xl font-black drop-shadow sm:text-3xl">{m.judul}</p>
+                      <p className="mt-1 text-sm opacity-95 sm:text-base">{m.teks}</p>
                     </div>
                   </div>
-                  <span className="absolute right-3 top-3 rounded-full bg-cream/90 px-3 py-1 text-xs font-bold text-wood-dark shadow">
-                    🔍 Perbesar
-                  </span>
                 </div>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Tombol panah */}
+        {/* Tombol panah — lebih gede & selalu keliatan, senada bingkai kayu */}
         <button
           onClick={() => setAktif((n) => (n - 1 + slide.length) % slide.length)}
-          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-cream/90 p-2 text-wood-dark shadow-lift transition hover:scale-110"
+          className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-cream text-xl font-black text-wood-dark shadow-lift transition hover:scale-110 sm:h-12 sm:w-12"
           aria-label="Sebelumnya"
         >
           ‹
         </button>
         <button
           onClick={() => setAktif((n) => (n + 1) % slide.length)}
-          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-cream/90 p-2 text-wood-dark shadow-lift transition hover:scale-110"
+          className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-cream text-xl font-black text-wood-dark shadow-lift transition hover:scale-110 sm:h-12 sm:w-12"
           aria-label="Berikutnya"
         >
           ›
         </button>
+      </div>
 
-        {/* Titik indikator */}
-        <div className="mt-4 flex justify-center gap-2">
-          {slide.map((m, i) => (
-            <button
-              key={m.judul}
-              onClick={() => setAktif(i)}
-              aria-label={`Ke slide ${i + 1}`}
-              className={`h-2 rounded-full transition-all ${
-                i === aktif ? "w-7 bg-primary" : "w-2 bg-primary/30"
-              }`}
-            />
-          ))}
-        </div>
+      {/* Titik indikator */}
+      <div className="mt-4 flex justify-center gap-2">
+        {slide.map((m, i) => (
+          <button
+            key={m.judul}
+            onClick={() => setAktif(i)}
+            aria-label={`Ke slide ${i + 1}`}
+            className={`h-2 rounded-full transition-all ${
+              i === aktif ? "w-7 bg-primary" : "w-2 bg-primary/30"
+            }`}
+          />
+        ))}
       </div>
 
       {/* Pop-up lightbox */}
@@ -98,7 +123,7 @@ export function MomentCarousel({ slide }: { slide: SlideMomen[] }) {
             style={{ animation: "popup-zoom 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <MomentIllustration variasi={slide[popup]!.variasi} />
+            <MomentIllustration variasi={slide[popup]!.variasi} foto={slide[popup]!.foto} />
             <div className="p-5">
               <p className="font-display text-2xl font-black">{slide[popup]!.judul}</p>
               <p className="mt-1 text-muted-foreground">{slide[popup]!.teks}</p>

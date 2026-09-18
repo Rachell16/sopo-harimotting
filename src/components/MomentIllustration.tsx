@@ -1,28 +1,36 @@
-// Ilustrasi kecil bergaya sama dengan hero (siluet + gradasi hangat), dipakai
-// sebagai pengganti kotak "foto belum ada" yang diulang-ulang. Begitu foto asli
-// tersedia, section yang memanggil ini tinggal diganti ke <img>.
+// ============================================================================
+// ILUSTRASI MOMEN — dipakai di carousel "Momen di Sini" di halaman utama.
+//
+// ADA 2 CARA NAMPILIN 1 SLIDE:
+// 1. Foto asli — kasih prop `foto` (path ke file di folder public/, misal
+//    "/images/kuda-1.jpg"). Kalau foto diisi, foto itu yang ditampilin,
+//    ilustrasi SVID di bawah otomatis di-skip.
+// 2. Ilustrasi gambar tangan — biarin `foto` kosong, isi `variasi` sesuai
+//    salah satu yang udah ada ("kuda" | "kelinci" | "gazebo" | "warung").
+//    Kalau kamu isi nama variasi BARU yang belum ada gambarnya di bawah,
+//    otomatis dia jatuh ke ilustrasi generik (bukit + matahari) — jadi gak
+//    akan error, cuma gambarnya polos aja sampai digambarin variasi barunya
+//    (atau sampai kamu upload foto asli dan pakai cara #1 di atas).
+// ============================================================================
 
-// export function MomentIllustration({
-//   variasi,
-//   foto,
-// }: {
-//   variasi: "kuda" | "kelinci" | "gazebo" | "warung";
-//   foto?: string; // contoh: "/images/kuda-1.jpg"
-// }) {
-//   // Kalau foto asli udah ada, tampilin itu aja, ilustrasi SVG di-skip semua
-//   if (foto) {
-//     return (
-//       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
-//         <img src={foto} alt={variasi} className="h-full w-full object-cover" />
-//       </div>
-//     );
-//   }
+export function MomentIllustration({
+  variasi,
+  foto,
+}: {
+  variasi: string;
+  foto?: string;
+}) {
+  // Cara #1: foto asli udah ada → tampilin itu aja.
+  if (foto) {
+    return (
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
+        <img src={foto} alt={variasi} className="h-full w-full object-cover" />
+      </div>
+    );
+  }
 
-//   return (
-//     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
-//       {/* ...semua kode SVG yang udah ada, biarin aja gak usah diubah... */}
-
-export function MomentIllustration({ variasi }: { variasi: "kuda" | "kelinci" | "gazebo" | "warung" }) {
+  // Cara #2: ilustrasi SVG. Latar gradasi + siluet bukit ini dipakai semua
+  // variasi, tinggal bagian bawah yang beda-beda per variasi.
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
       <div
@@ -86,6 +94,14 @@ export function MomentIllustration({ variasi }: { variasi: "kuda" | "kelinci" | 
           <rect x="120" y="96" width="80" height="38" fill="oklch(0.28 0.06 42)" />
           <path d="M112 96 L208 96 L196 76 L124 76 Z" fill="oklch(0.5 0.15 30)" />
           <rect x="132" y="110" width="16" height="24" fill="oklch(0.9 0.14 85)" />
+        </svg>
+      )}
+
+      {/* Fallback generik — dipakai otomatis kalau kamu isi `variasi` dengan
+          nama baru yang belum digambarin di atas. Aman, gak akan blank/error. */}
+      {!["kuda", "kelinci", "gazebo", "warung"].includes(variasi) && (
+        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 300 225">
+          <circle cx="150" cy="46" r="18" fill="oklch(0.9 0.14 85)" />
         </svg>
       )}
     </div>

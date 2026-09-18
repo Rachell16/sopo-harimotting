@@ -26,6 +26,8 @@ export const Route = createFileRoute("/")({
   component: LandingPage,
 });
 
+// Mau nambah fasilitas baru? Copy 1 blok { ikon, judul, teks } di bawah,
+// tempel, ganti isinya. Urutannya otomatis selang-seling kiri-kanan sendiri.
 const FASILITAS = [
   {
     ikon: "🐴",
@@ -59,6 +61,22 @@ const FASILITAS = [
   },
 ];
 
+// ============================================================================
+// DAFTAR "MOMEN" DI CAROUSEL GALERI (section "Momen di Sini" di bawah).
+// Mau nambah area/momen baru? Tinggal copy 1 blok { ... } di bawah, tempel di
+// bawahnya, ganti isinya. Contoh nambah "Kolam Ikan":
+//
+//   {
+//     variasi: "kolam-ikan",             // nama bebas, dipakai ilustrasi generik
+//                                         // sampai kamu isi `foto` di bawah
+//     judul: "Kolam Ikan",
+//     teks: "Deskripsi singkat area ini.",
+//     foto: "/images/kolam-ikan.jpg",    // opsional — hapus baris ini dulu
+//                                         // kalau foto asli belum ada
+//   },
+//
+// Gak perlu ubah file lain — carousel-nya otomatis nambah slide sendiri.
+// ============================================================================
 const MOMEN: SlideMomen[] = [
   {
     variasi: "kelinci",
