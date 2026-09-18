@@ -120,18 +120,8 @@ function LandingPage() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          {/* CTA BELI TIKET */}
-          <div className="hero-muncul relative z-10 -mt-7 mb-14">
-            <Link
-              to="/kasir"
-              className="cta-berdenyut block w-full rounded-2xl bg-accent px-4 py-5 text-center font-display text-2xl font-black text-accent-foreground transition hover:-translate-y-0.5 active:translate-y-0.5"
-            >
-              🎟️ Beli Tiket Masuk
-            </Link>
-          </div>
-
           {/* TENTANG */}
-          <Reveal id="tentang" className="mb-16 scroll-mt-24">
+          <Reveal id="tentang" className="mb-16 scroll-mt-24 mt-10">
             <p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-primary/70">
               Tentang kami
             </p>
@@ -196,6 +186,14 @@ function LandingPage() {
                 </p>
               </div>
             </div>
+
+            {/* CTA BELI TIKET — dipindah ke sini, deket harga, biar hero-nya bersih & bisa langsung discroll */}
+            <Link
+              to="/kasir"
+              className="cta-berdenyut mx-auto mt-8 block max-w-md rounded-2xl bg-accent px-4 py-5 text-center font-display text-2xl font-black text-accent-foreground transition hover:-translate-y-0.5 active:translate-y-0.5"
+            >
+              🎟️ Beli Tiket Masuk
+            </Link>
           </Reveal>
 
           {/* ALAMAT & LOKASI — panel gelap senada hero, kontras premium */}
