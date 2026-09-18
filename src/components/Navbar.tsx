@@ -9,8 +9,6 @@ const NAV_LINKS = [
   { href: "#lokasi", label: "Lokasi" },
 ];
 
-// Transparan & teks krem di atas hero, begitu discroll lewat hero otomatis
-// jadi panel kayu solid + shadow, kayak navbar situs wisata besar pada umumnya.
 export function Navbar() {
   const [discroll, setDiscroll] = useState(false);
 
@@ -18,8 +16,10 @@ export function Navbar() {
     function cekScroll() {
       setDiscroll(window.scrollY > 64);
     }
+
     cekScroll();
     window.addEventListener("scroll", cekScroll, { passive: true });
+
     return () => window.removeEventListener("scroll", cekScroll);
   }, []);
 
@@ -30,17 +30,17 @@ export function Navbar() {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
-  <a href="#" className="flex items-center gap-2 text-cream">
-    <img
-      src="/favicon.ico"
-      className="h-8 w-8 object-contain"
-    />
+        <a href="#" className="flex items-center gap-2 text-cream">
+          <img
+            src="/logo.png"
+            alt="Sopo Harimotting Logo"
+            className="h-8 w-8 object-contain"
+          />
 
-    <span className="font-display text-lg font-black tracking-tight sm:text-xl">
-      Sopo Harimotting
-    </span>
-  </a>
-</div>
+          <span className="font-display text-lg font-black tracking-tight sm:text-xl">
+            Sopo Harimotting
+          </span>
+        </a>
 
         <div className="hidden items-center gap-6 sm:flex">
           {NAV_LINKS.map((l) => (
