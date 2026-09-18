@@ -95,17 +95,17 @@ export function MomentCarousel({ slide }: { slide: SlideMomen[] }) {
             key={m.judul}
             data-kartu
             onClick={() => setPopup(i)}
-            className="w-[68%] shrink-0 snap-start text-left sm:w-[38%] lg:w-[26%] xl:w-[22%]"
+            className="w-[85%] shrink-0 snap-start text-left sm:w-[55%] lg:w-[38%] xl:w-[32%]"
             aria-label={`Lihat lebih besar: ${m.judul}`}
           >
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border-4 border-wood shadow-lift">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border-4 border-wood shadow-lift">
               <MomentIllustration variasi={m.variasi} foto={m.foto} />
-              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4">
-                <p className="font-display text-lg font-black leading-tight text-cream drop-shadow sm:text-xl">
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-5">
+                <p className="font-display text-xl font-black leading-tight text-cream drop-shadow sm:text-2xl">
                   {m.judul}
                 </p>
-                <p className="mt-1 line-clamp-2 text-xs text-cream/90 sm:text-sm">{m.teks}</p>
-                <span className="mt-3 inline-block rounded-full bg-cream px-3 py-1.5 text-center text-xs font-black text-wood-dark">
+                <p className="mt-1.5 line-clamp-2 text-sm text-cream/90 sm:text-base">{m.teks}</p>
+                <span className="mt-4 inline-block rounded-full bg-cream px-4 py-2 text-center text-sm font-black text-wood-dark">
                   Lihat lebih besar
                 </span>
               </div>

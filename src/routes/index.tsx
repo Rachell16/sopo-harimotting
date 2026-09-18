@@ -151,38 +151,36 @@ function LandingPage() {
             <MomentCarousel slide={MOMEN} />
           </Reveal>
 
-          {/* FASILITAS — daftar editorial, bukan grid kartu identik */}
-          <Reveal id="fasilitas" className="mb-16 scroll-mt-24">
-            <h2 className="mb-6 font-display text-4xl font-black">Fasilitas</h2>
-            <div className="divide-y-2 divide-dashed divide-border">
+          {/* FASILITAS — kartu bulat kayak "5 Pilar" Kebun Raya */}
+          <Reveal id="fasilitas" className="mb-16 scroll-mt-24 text-center">
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">Yang Bisa Dinikmati</p>
+            <h2 className="mb-8 font-display text-4xl font-black">Fasilitas</h2>
+            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
               {FASILITAS.map((f, i) => (
                 <div
                   key={f.judul}
-                  className={`flex items-center gap-5 py-5 ${i % 2 === 1 ? "flex-row-reverse text-right" : ""}`}
+                  className="kartu-farm flex flex-col items-center p-6 text-center transition hover:-translate-y-1 hover:shadow-lift"
                 >
                   <span
-                    className="ikon-ayun shrink-0 text-4xl"
+                    className="ikon-ayun flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-3xl"
                     style={{ animationDelay: `${i * 0.25}s` }}
                   >
                     {f.ikon}
                   </span>
-                  <div>
-                    <p className="font-display text-xl font-black">{f.judul}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {f.teks}
-                    </p>
-                  </div>
+                  <p className="mt-4 font-display text-lg font-black">{f.judul}</p>
+                  <p className="mt-1.5 text-sm text-muted-foreground">{f.teks}</p>
                 </div>
               ))}
             </div>
           </Reveal>
 
           {/* HARGA TIKET — gaya kartu tiket bergerigi */}
-          <Reveal id="harga" className="mb-16 scroll-mt-24">
+          <Reveal id="harga" className="mb-16 scroll-mt-24 text-center">
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">Investasi Liburan</p>
             <h2 className="mb-6 font-display text-4xl font-black">
               Harga Tiket Masuk
             </h2>
-            <div className="grid max-w-md grid-cols-2 gap-6">
+            <div className="mx-auto grid max-w-md grid-cols-2 gap-6">
               <div className="kartu-tiket p-5 text-center transition hover:-translate-y-1">
                 <span className="text-3xl">🧑‍🌾</span>
                 <p className="mt-1 font-display text-lg font-black">Dewasa</p>
@@ -201,9 +199,10 @@ function LandingPage() {
           </Reveal>
 
           {/* ALAMAT & LOKASI — panel gelap senada hero, kontras premium */}
-          <Reveal id="lokasi" className="mb-4 scroll-mt-24">
+          <Reveal id="lokasi" className="mb-4 scroll-mt-24 text-center">
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">Cara Sampai ke Sini</p>
             <h2 className="mb-6 font-display text-4xl font-black">Lokasi</h2>
-            <div className="panel-kayu max-w-2xl rounded-2xl p-6 shadow-lift sm:p-8">
+            <div className="panel-kayu mx-auto max-w-2xl rounded-2xl p-6 text-left shadow-lift sm:p-8">
               <p className="font-bold opacity-90">📍 Alamat</p>
               <p className="mt-1 opacity-80">
                 Desa Paniaran, Kecamatan Siborongborong, Kabupaten Tapanuli
@@ -228,11 +227,12 @@ function LandingPage() {
           </Reveal>
 
           {/* KONTAK & SOSIAL MEDIA */}
-          <Reveal className="mb-4">
+          <Reveal className="mb-4 text-center">
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.25em] text-primary/70">Terhubung Terus</p>
             <h2 className="mb-6 font-display text-4xl font-black">
               Hubungi & Ikuti Kami
             </h2>
-            <div className="grid max-w-md grid-cols-3 gap-3">
+            <div className="mx-auto grid max-w-md grid-cols-3 gap-3">
               <a
                 href="https://wa.me/6282213079439"
                 target="_blank"
